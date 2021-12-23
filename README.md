@@ -1,5 +1,5 @@
 # fabric
-### Fabric is simple transactional message passing web worker process manager for web workers. 
+### Simple future transactional message passing web worker process manager. 
 
 Install
 ```shell
