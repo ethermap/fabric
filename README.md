@@ -1,5 +1,5 @@
-# fabric
-### Simple future transactional message passing web worker process manager. 
+# Fabric
+### Fabric of space time. Simple future transactional message passing web worker process manager. 
 
 Install
 ```shell
