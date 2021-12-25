@@ -3,15 +3,21 @@ import fabric from './fabric.js';
 
 window.addEventListener( 'load' , function(){
 
-    fabric.spawnProcess(  { fn:'init' , domain:'coinbase' , symbol:'BTC/USD' } );
-    fabric.spawnProcess(  { fn:'init' , domain:'ethereum' , symbol:'ETH/USD' } );
-    fabric.spawnProcess(  { fn:'init' , domain:'binanceus', symbol:'BTC/USD' } );
+    fabric.mergeIntent(  { domain:'coinbase',  fn:'init' , symbol:'BTC/USD' } );
+    fabric.mergeIntent(  { domain:'ethereum',  fn:'init' , symbol:'ETH/USD' } );
+    fabric.mergeIntent(  { domain:'binanceus', fn:'init' , symbol:'BTC/USD' } );
+    //fabric.publishIntent(  { domain:['ccxt','coinbase','BTC/USD','init'] } );
+    //fabric.publishIntent(  { domain:'ccxt.coinbase.btc.close' } );
     
-    fabric.addEventListener( 'fabricEvent' , function( e ){
-
-        var r=e.detail;
-        var i=3;
+    fabric.addEventListener( 'channelEvent' , function( e ){
+        console.log('')
+        var data=e.detail;
+        var domain=data.domain;
+        var symbol=data.symbol;
+        var xclass=data.xclass; 
+        var i=0;
     })
+
     //fabric.echoFunction(  { seek:nodeIDparamDomain[ domain, symbol ]( x,y,z*,s,t ) . demand:priceVector   })
     //fabric.spawnRequest(  { domain:symbol:xclass } )
 

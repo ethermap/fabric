@@ -1,5 +1,6 @@
-# Fabric
-### Fabric of space time. Simple future transactional message passing web worker process manager. 
+
+## Time Fabric 
+#### Transactional L2 Serice Worker worker manager.  passing web worker process manager. 
 
 Install
 ```shell
@@ -11,9 +12,9 @@ Basic Usage:
 ```javascript
 import fabric from './fabric' 
 
-fabric.publishIntent(  { fn:'init' , domain:'ethereum' , symbol:'ETH/USD' } );
-fabric.publishIntent(  { fn:'init' , domain:'binanceus', symbol:'BTC/USD' } );
-fabric.addEventListener( 'fabricEvent' , function( e ){
+fabric.mergeIntent(  { fn:'init' , domain:'ethereum' , symbol:'ETH/USD' } );
+fabric.mergeIntent(  { fn:'init' , domain:'binanceus', symbol:'BTC/USD' } );
+fabric.addEventListener( 'channelEvent' , function( e ){
 
     var r=e.detail;
     var i=3;
