@@ -1,6 +1,7 @@
 
 ## Time Fabric 
-#### Transactional L2 Serice Worker worker manager.  passing web worker process manager. 
+#### Transactional LL2 Serice Worker Manager
+https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API manager.  passing web worker process manager. 
 
 Install
 ```shell
