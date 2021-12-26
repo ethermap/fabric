@@ -27,12 +27,22 @@ async function mergeIntent( intentObj ){
     // check if address space contains initObj.address ( ob_vec )
     // if no node exists , spawn process and register with procs 
     // df[  ]
-    var wrkr =  new Worker('./vehicle.js');
+    const workerUrl = location + '';
+    const basePath = workerUrl.replace(/\/[^/]+$/, '/');
+    
+    //self.importScripts(basePath + '/fooWorker.js');
+    
+                                                                // must absolute path cause Workers use  location.pathname 
+    var wrkr =  new Worker('/x_modules/fabric/vehicle.js');
     //var wrkr =  new Worker('./x_modules/fabric/vehicleb.js',{ type:'module' } );
     procs.push( wrkr )
     wrkr.postMessage( intentObj )
     wrkr.addEventListener("message", handleMessageFromWorker );
-        
+    // Worker.onerror   //  ErrorEvent of type error event occurs.
+    // Worker.onmessage    //  MessageEvent of type message occurs — i.e. when a message is sent to the parent document from the worker via DedicatedWorkerGlobalScope.postMessage. The message is stored in the event's data property.
+    // Worker.onmessageerror
+    
+    
     console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
     console.log( intentObj )
 }
