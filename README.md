@@ -28,3 +28,6 @@ fabric.addEventListener( 'channelEvent' , function( e ){
     var i=3;
 })
 ```
+
+### Appendix
+Basic input appendix
