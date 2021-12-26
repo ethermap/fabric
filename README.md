@@ -10,6 +10,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API manager.  pa
 Install
 ```shell
 npm install https://github.com/psytron/fabric
+// OR DEV INSTALL
+git submodule add git@github.com:psytron/fabric path/to/project
 ```
 
 Basic Usage: 
