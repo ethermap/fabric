@@ -4,7 +4,8 @@
 ![TFx](https://raw.githubusercontent.com/psytron/fabric/main/tfx.jpg)
 
 #### Serice Worker Message Cue
-https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API manager.  passing web worker process manager. 
+Event based and process manager for [Mozilla Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+message passing web worker. 
 
 
 Install
