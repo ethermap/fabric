@@ -27,6 +27,9 @@ fabric.addEventListener( 'channelEvent' , function( e ){
     var r=e.detail;
     var i=3;
 })
+
+fabric.mergeSequence( [ { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' }, 
+                        { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' } ] );
 ```
 
 ### Appendix
