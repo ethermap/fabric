@@ -32,7 +32,7 @@ async function mergeIntent( intentObj ){
     const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
 
     const driver_path = '/x_modules/fabric/drivers/vehicle_'+driver+'.js';
-    //self.importScripts(basePath + '/fooWorker.js');
+    //const driver_path = './drivers/vehicle_'+driver+'.js';
     
     // must absolute path cause Workers use  location.pathname 
     var wrkr =  new Worker( driver_path );
