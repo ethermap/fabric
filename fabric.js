@@ -29,11 +29,13 @@ async function mergeIntent( intentObj ){
     // df[  ]
     const workerUrl = location + '';
     const basePath = workerUrl.replace(/\/[^/]+$/, '/');
-    
+    const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
+
+    const driver_path = '/x_modules/fabric/drivers/vehicle_'+driver+'.js';
     //self.importScripts(basePath + '/fooWorker.js');
     
-                                                                // must absolute path cause Workers use  location.pathname 
-    var wrkr =  new Worker('/x_modules/fabric/vehicle.js');
+    // must absolute path cause Workers use  location.pathname 
+    var wrkr =  new Worker( driver_path );
     //var wrkr =  new Worker('./x_modules/fabric/vehicleb.js',{ type:'module' } );
     procs.push( wrkr )
     wrkr.postMessage( intentObj )

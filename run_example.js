@@ -3,9 +3,15 @@ import fabric from './fabric.js';
 
 window.addEventListener( 'load' , function(){
 
-    fabric.mergeIntent(  { domain:'coinbase',  fn:'init' , symbol:'BTC/USD' } );
-    fabric.mergeIntent(  { domain:'ethereum',  fn:'init' , symbol:'ETH/USD' } );
-    fabric.mergeIntent(  { domain:'binanceus', fn:'init' , symbol:'BTC/USD' } );
+    // DESIRED RETURNS: 
+    // Entity.domain new Adderss and priv-key
+    // Entity.domain existing-price-cluster
+    // Entity.domain.xclass / cluster  time-series 
+    // 
+
+    fabric.mergeIntent(  { driver:'ccxt', domain:'coinbase',  fn:'init' , symbol:'BTC/USD' } );
+    fabric.mergeIntent(  { driver:'ethers', domain:'ethereum',  fn:'init' , symbol:'ETH/USD' } );
+    fabric.mergeIntent(  { driver:'ccxt', domain:'binanceus', fn:'init' , symbol:'BTC/USD' } );
     //fabric.publishIntent(  { domain:['ccxt','coinbase','BTC/USD','init'] } );
     //fabric.publishIntent(  { domain:'ccxt.coinbase.btc.close' } );
     
