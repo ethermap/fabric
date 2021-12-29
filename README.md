@@ -23,11 +23,8 @@ import fabric from './fabric'
 
 fabric.mergeIntent(  { fn:'init' , domain:'ethereum' , symbol:'ETH/USD' } );
 fabric.mergeIntent(  { fn:'init' , domain:'binanceus', symbol:'BTC/USD' } );
-fabric.addEventListener( 'channelEvent' , function( e ){
-
-    var r=e.detail;
-    var i=3;
-})
+fabric.addEventListener( 'channelEvent' , function( e ){} );
+fabric.addEventListener( 'channelEvent' , yourApp.pubSubHook );
 
 fabric.mergeSequence( [ { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' }, 
                         { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' } ] );
