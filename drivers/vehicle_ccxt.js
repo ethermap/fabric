@@ -13,7 +13,8 @@ var messageStruct = {
     domain:this.domain
 }
 var routes = {
-    'init':init
+    'init':init,
+    'close':init
 }
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var access_count = 0;
@@ -21,7 +22,8 @@ var access_count = 0;
 
 onmessage = function(e) {
     console.log('Worker: VEH CXT '+ wid+' Receives Message Data:', e.data );
-    routes[ e.data.fn ]( e.data );
+    var xclass = ( 'xclass' in e.data ) ? e.data.xclass : ( 'fn' in e.data )? e.data.fn : 'init';
+    routes[xclass ]( e.data );
 }
 
 
@@ -43,6 +45,7 @@ async function init( obj ){
     v.fetchTicker('BTC/USD').then( function( tick ){
         tick.domain = obj.domain;
         tick.symbol='BTC/USD';
+        console.log( tick )
         postMessage( tick );    
     });
 

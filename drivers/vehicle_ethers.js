@@ -30,7 +30,9 @@ var messageStruct = {
     domain:this.domain
 }
 var routes = {
-    'init':init
+    'init':init ,
+    'base':init,
+    'close':init
 }
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var access_count = 0;
@@ -39,7 +41,8 @@ var access_count = 0;
 
 onmessage = function(e) {
     console.log('Worker Vehicle ETHERS: '+ wid+' Receives Message Data:', e.data );
-    routes[ e.data.fn ]( e.data );
+    var xclass = ( 'xclass' in e.data ) ? e.data.xclass : ( 'fn' in e.data )? e.data.fn : 'init';
+    routes[ xclass ]( e.data );
 }
 
 // CALLBACK REPEAT 
