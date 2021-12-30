@@ -50,16 +50,15 @@ async function mergeIntent( intentObj ){
 
     // INITIALIZE WRAPPR 
     wrkr.postMessage( px3 )
-    // wrkr.addEventListener("message", handleMessageFromWorker );
+    wrkr.addEventListener("message", handleMessageFromWorker );
     // Worker.onerror        // ErrorEvent of type error event occurs.
     // Worker.onmessage      // MessageEvent of type message occurs — i.e. when a message is sent to the parent document from the worker via DedicatedWorkerGlobalScope.postMessage. The message is stored in the event's data property.
     // Worker.onmessageerror // 
-    
-    console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
-    console.log( intentObj )
+    //console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
+    //console.log( intentObj )
 }
 function handleMessageFromWorker( e ){
-    console.log(' Fabric Hears: ', e.data.domain , e.data.symbol , e.data.last );
+    console.log(' Fabric Hears: ', e.data.domain , e.data.symbol , e.data );
     dispatchEvent( new CustomEvent('channelEvent', {detail:e.data} )  );
 }
 

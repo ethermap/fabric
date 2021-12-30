@@ -45,13 +45,6 @@ onmessage = function(e) {
     routes[ xclass ]( e.data );
 }
 
-// CALLBACK REPEAT 
-var intervalID = setInterval(myCallback, 3500, 'Parameter 1', 'Parameter 2');
-async function myCallback(a, b)
-{
-
-
-}
 
 
 async function init( obj ){
@@ -63,11 +56,17 @@ async function init( obj ){
     var tether_abi = await fetchAbi( usdt_address );
     var usdt = new ethers.Contract( usdt_address , tether_abi  );
     var dec = await usdt.connect( provider ).decimals()
-    var whalbal = await usdt.connect( provider ).balanceOf( usdt_whale_address )
-    var a = 34;            
-    postMessage( { block:whalbal  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
 
- 
+    // CALLBACK REPEAT 
+    var intervalID = setInterval(myCallback, 3500, 'Parameter 1', 'Parameter 2');
+    async function myCallback(a, b)
+    {
+        var whalbal = await usdt.connect( provider ).balanceOf( usdt_whale_address )
+        var blocknum = await  provider.getBlockNumber();
+        postMessage( { block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
+
+    }
+
 }
 
 
