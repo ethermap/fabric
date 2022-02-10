@@ -8,7 +8,7 @@ importScripts('/v_modules/ethers-5.1.umd.min.js'); // DEFI
 
 
 // import ethers from '/v_modules/ethers-5.1.esm.min.js';
-//importScripts('/v_modules/polygon.v.u.js')       // TRAD
+// importScripts('/v_modules/polygon.v.u.js')       // TRAD
 const usdt_address = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
 const usdc_address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';    
 const wbtc_address = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599';
@@ -32,17 +32,22 @@ var messageStruct = {
 var routes = {
     'init':init ,
     'base':init,
-    'close':init
+    'close':init,
+    'spawn':init
 }
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var access_count = 0;
 
-
+var initObj;
 
 onmessage = function(e) {
     console.log('Worker Vehicle ETHERS: '+ wid+' Receives Message Data:', e.data );
-    var xclass = ( 'xclass' in e.data ) ? e.data.xclass : ( 'fn' in e.data )? e.data.fn : 'init';
+    
+    initObj = e.data;
+    var xclass = ( 'fn' in e.data ) ? e.data.fn : ( 'xclass' in e.data )? e.data.xclass : 'init';
+    
     routes[ xclass ]( e.data );
+
 }
 
 
@@ -50,23 +55,23 @@ onmessage = function(e) {
 async function init( obj ){
     console.log( ' init in Worker: ', wid , this , self );
  
-    provider = new ethers.providers.AlchemyProvider();
-    provider.getBlockNumber().then( async (result) => {   console.log("Current block number: " + result);     });
+
+    //provider = new ethers.providers.AlchemyProvider();
+    //provider.getBlockNumber().then( async (result) => {   console.log("Current block number: " + result);     });
     // USDT
-    var tether_abi = await fetchAbi( usdt_address );
-    var usdt = new ethers.Contract( usdt_address , tether_abi  );
-    var dec = await usdt.connect( provider ).decimals()
+    //var tether_abi = await fetchAbi( usdt_address );
+    //var usdt = new ethers.Contract( usdt_address , tether_abi  );
+    //var dec = await usdt.connect( provider ).decimals()
 
     // CALLBACK REPEAT 
     var intervalID = setInterval(myCallback, 3500, 'Parameter 1', 'Parameter 2');
     async function myCallback(a, b)
     {
-        var whalbal = await usdt.connect( provider ).balanceOf( usdt_whale_address )
-        var blocknum = await  provider.getBlockNumber();
-        postMessage( { block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
-
+        console.log(' worker: ', wid)
+        //var whalbal = await usdt.connect( provider ).balanceOf( usdt_whale_address )
+        //var blocknum = await  provider.getBlockNumber();
+        //postMessage( { block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
     }
-
 }
 
 
@@ -78,7 +83,7 @@ async function fetchAbi( addr_in ){
     var prom = new Promise( async ( resolve, reject ) => {
         var esk = '6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
         var url = "https://api.etherscan.io/api?module=contract&action=getabi&address="+addr_in+"&apikey=6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2";
-        var options = {json: true};
+        var options = { json: true };
         const response = await fetch( url );
         const ab = await response.json();
         resolve( ab.result )
