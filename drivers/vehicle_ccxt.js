@@ -1,71 +1,61 @@
 
 
+// OLD SCHOOL UNTIL ES6 SUPPORT IN R_WEBVIEW
+importScripts('/v_modules/ccxt.browser.js');       
+importScripts('/x_modules/fabric/misc.js');      
 
 
-
-importScripts('/v_modules/ccxt.browser.js');       // CEFI 
- 
-
-var tick ={ returned:'dat'}
-var messageStruct = {
-    fn:'fetchTicker',
-    obj:tick , 
-    domain:this.domain
-}
-var routes = {
-    'init':init,
-    'close':init
-}
+// LOCAL VARS 
+var driver;
 var wid = 'w'+ Math.round( Math.random()*9999 );
+var initObj = {}
 var access_count = 0;
+var methods = { 'init':init, 'spawn':init , fetchTicker:fetchTicker };
 
 
-onmessage = function(e) {
-    console.log('Worker: VEH CXT '+ wid+' Receives Message Data:', e.data );
-    var xclass = ( 'xclass' in e.data ) ? e.data.xclass : ( 'fn' in e.data )? e.data.fn : 'init';
-    routes[xclass ]( e.data );
+// ALL INCOMING MESSAGES ROUTED
+onmessage = incomingRequest;
+function incomingRequest( e ){
+    var xclass = ( 'method' in e.data ) ? e.data.method : ( 'fn' in e.data )? e.data.fn : 'init';
+    methods[ xclass ]( e.data );
 }
 
 
 
-// CALLBACK REPEAT 
-var intervalID = setInterval(myCallback, 3500, 'Parameter 1', 'Parameter 2');
-async function myCallback(a, b)
-{
 
-
-}
-
-
+// FUNCTIONAL METHODS: 
 async function init( obj ){
-    console.log( ' init in Worker: ', wid , this , self );
+    // CREATE DRIVER INSTANCE FIRST RUN 
+    driver = new ccxt[ obj.carrier ]({ ...{} , ...{key:obj.ke,secret:obj.se} });
+    initObj=obj;
+}
 
-    var veh = ccxt[ obj.domain ]
-    var v = new veh();
-    v.fetchTicker('BTC/USD').then( function( tick ){
+
+async function fetchTicker( obj ){
+
+    driver.fetchTicker('ETH/USD').then( function( tick ){
         tick.domain = obj.domain;
-        tick.symbol='BTC/USD';
-        console.log( tick )
+        tick.symbol='ETH/USD';
+        tick.method = 'fetchTicker';
+        tick.uuid = initObj.uuid; 
         postMessage( tick );    
     });
-
 }
 
 
 
 
 
-async function fetchAbi( addr_in ){
-    var prom = new Promise( async ( resolve, reject ) => {
-        var esk = '6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
-        var url = "https://api.etherscan.io/api?module=contract&action=getabi&address="+addr_in+"&apikey=6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2";
-        var options = {json: true};
-        const response = await fetch( url );
-        const ab = await response.json();
-        resolve( ab.result )
-    });
-    return prom;
-}
+
+
+
+
+
+
+
+
+
+
 
 
 

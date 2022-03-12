@@ -3,6 +3,28 @@
 
 
 
+
+
+
+
+
+
+// inboundMessage 
+// outboumdMessage 
+
+// function toWorker()
+// function fromWorker() 
+
+
+
+
+
+
+
+
+
+
+
 importScripts('/v_modules/ccxt.browser.js');       // CEFI 
 importScripts('/v_modules/ethers-5.1.umd.min.js'); // DEFI 
 
@@ -35,6 +57,11 @@ var routes = {
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var access_count = 0;
 
+
+onmessage = function(e) {
+    console.log('Worker: '+ wid+' Receives Message Data:', e.data );
+    routes[ e.data.fn ]( e.data );
+}
 
 
 
@@ -71,11 +98,6 @@ async function init( obj ){
         });
     }
 }
-onmessage = function(e) {
-    console.log('Worker: '+ wid+' Receives Message Data:', e.data );
-    routes[ e.data.fn ]( e.data );
-}
-
 
 
 

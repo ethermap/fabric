@@ -1,6 +1,4 @@
 
-
-//////////////
                                                                                         /*
   _____      ___.         .__                 _____                                     
 _/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____  ____  
@@ -9,59 +7,76 @@ _/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____
  |__|  (____  /___  /__|  |__|\___  >  \____/|__|    /____  >|   __(____  /\___  >___  >
             \/    \/              \/                      \/ |__|       \/     \/    \/ */
 
-var procs = []                             // ALL PROCESSES
-var eventer = new EventTarget();           // FABRIC EVENTER 
-var input_to_request={                     // MAP-INTERACTION : FABRIC-REQUEST
-       init: 'init',                       // START PROCESS 
-focusObject: 'loadCluster' ,               // LOADS  Metadata about object + time series segment 
+// LOCALS IN MOD SCOPE
+var procs = {};                         // ALL PROCESSES
+var eventer = new EventTarget();        // FABRIC EVENTER 
+var creds = false;                      // future cache ref 
+var input_to_request={                  // MAP-INTERACTION : FABRIC-REQUEST
+       init: 'init',                    // START PROCESS 
+focusObject: 'loadCluster' ,            // LOADS  Metadata about object + time series segment 
 objectAdded: 'loadSupportingObjectProc',   // fabric.publishIntent( vector:object )
   mapLoaded: 'spawnAllSupportingObjects', //  fabric.
 }
 
-// HIGH LEVEL SERVICEGRID ACCESS 
-function init(){
-    console.log(' start fabric ')
+
+// HIGH LEVEL SERVICEGRID
+function init( initObj ){
+    creds = initObj.creds; 
 }
 
+
+
+// GENERAL PROC START 
 async function mergeIntent( intentObj ){
-    // CHECK address space contains initObj.address ( ob_vec )
-    // if no node exists , spawn process and register with procs 
-    // df[  ]
+    console.log(' merge Intent ', new Date().getTime() )    
 
-    // SHRINK EACH WORKER WITH PRE_SHAKEN IMPORT DEPS 
-    const workerUrl = location + '';
-    const basePath = workerUrl.replace(/\/[^/]+$/, '/');
-    const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
-    const driver_path = '/x_modules/fabric/drivers/vehicle_'+driver+'.js';
-    //const driver_path = './drivers/vehicle_'+driver+'.js';
-
-    // must absolute path cause Workers use  location.pathname 
-    var wrkr = new Worker( driver_path );
-    //var wrkr =  new Worker('./x_modules/fabric/vehicleb.js',{ type:'module' } );
-    procs.push( wrkr )
-    // Here have to strip refs to ensure structured clone
-    // intentObj has internal References to ( model etc ). 
-    // but here its not necessary for inserting intent Obj 
-    
-    // STRUCTURED CLONE COMPATIBILITY 
+    // STRUCTURED CLONE COMPATIBILITY STRIP REFS  
     var px1 = { ...intentObj }                      // "Spread"
     var px2 = Object.assign({}, intentObj )         // "Object.assign"
-    var px3 = JSON.parse(JSON.stringify(intentObj)) // "JSON"
+    var px3 = JSON.parse(JSON.stringify(intentObj)) // "JSON"    
 
-    // INITIALIZE WRAPPR 
-    wrkr.postMessage( px3 )
-    wrkr.addEventListener("message", handleMessageFromWorker );
-    // Worker.onerror        // ErrorEvent of type error event occurs.
-    // Worker.onmessage      // MessageEvent of type message occurs — i.e. when a message is sent to the parent document from the worker via DedicatedWorkerGlobalScope.postMessage. The message is stored in the event's data property.
-    // Worker.onmessageerror // 
-    //console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
-    //console.log( intentObj )
+    // AQUIRE PER UUID OR SPAWN: 
+    var target_worker;
+    if( procs[ intentObj.uuid ] ){
+        target_worker = procs[ intentObj.uuid ].worker;
+        target_worker.postMessage( intentObj );
+    }else{
+        const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
+        const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
+        const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
+        // var wrkr =  new Worker('./x_modules/fabric/vehicleb.js',{ type:'module' } );
+        target_worker = new Worker( driver_path   );  // MUST USE ABSO PATH 
+        procs[ intentObj.uuid ] = { worker:target_worker }; 
+        target_worker.addEventListener("message", messageFromWorker );        
+        target_worker.addEventListener("onerror", messageFromWorker );      
+        target_worker.postMessage( { ...px3 , ...creds.keySelect(  'dom' , intentObj.dom )  } )
+    }
+
 }
-function handleMessageFromWorker( e ){
+
+
+// EVENTS BUBBLING UP FROM WORKERS 
+function messageFromWorker( e ){
     console.log(' Fabric Hears: ', e.data.domain , e.data.symbol , e.data );
-    dispatchEvent( new CustomEvent('channelEvent', {detail:e.data} )  );
+    var messageObject = e.data;
+    if( messageObject.method == 'report'){
+        procs[ messageObject.uuid ]['wid']=messageObject['wid'];
+    }
+    if( messageObject.method == 'fetchTicker'){
+    }
+    dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
 }
 
+
+function errorFromWorker( e ){
+    console.log(' Fabric ERROR: ', e );
+}
+
+function messageToWorker( e ){
+    //  FIND Worker by ID in existing workers list: 
+    //  If worker does not exist , spawn worker: 
+    //  after worker spawned or retrieved postMessage () 
+}
 
 async function querySegment( targObj ){
     // query Graph , match graph with grid of avail 
@@ -72,13 +87,35 @@ function objectsOnline(){
 
     // return running object process  p[ ]
     console.log( procs );
+    return procs;
 }
+function getProcs(){
+    return procs;
+}
+function dropProcs(){
+    for( var p in procs ){
 
+        var pr = procs[p];
+        pr.terminate();
+        console.log( 'terminated: ',p)
+    }
+}
 export default {
     init,
     objectsOnline,
+    dropProcs,
+    getProcs,
     mergeIntent ,
     addEventListener:eventer.addEventListener.bind(this),
     removeEventListener:eventer.removeEventListener.bind(this),
     dispatchEvent:eventer.dispatchEvent.bind(this)
 }
+
+
+
+    // FUTURE ENABLE ERROR TRACK 
+    // Worker.onerror        // ErrorEvent of type error event occurs.
+    // Worker.onmessage      // MessageEvent of type message occurs — i.e. when a message is sent to the parent document from the worker via DedicatedWorkerGlobalScope.postMessage. The message is stored in the event's data property.
+    // Worker.onmessageerror // 
+    //console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
+    //console.log( intentObj )
