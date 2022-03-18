@@ -44,6 +44,15 @@ const dai_whale_address = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643';
 const uni_whale_address = '0x1a9c8182c09f50c8318d769245bea52c32be35bc';
 const weth_whale_address = '0x030ba81f1c18d280636f32af80b9aad02cf0854e';
 
+// import ethers from '/v_modules/ethers-5.1.esm.min.js';
+// importScripts('/v_modules/polygon.v.u.js')       // TRAD
+ 
+
+var cons ={
+
+    uniswap: uni_address,
+    
+}
 
 var tick ={ returned:'dat'}
 var messageStruct = {

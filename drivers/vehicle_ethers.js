@@ -3,34 +3,9 @@
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
 
-// import ethers from '/v_modules/ethers-5.1.esm.min.js';
-// importScripts('/v_modules/polygon.v.u.js')       // TRAD
-const usdt_address = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
-const usdc_address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';    
-const wbtc_address = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599';
-const dai_address = '0x6b175474e89094c44da98b954eedeac495271d0f';
-const uni_address = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984';
-const weth_address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
-const usdt_whale_address = '0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503';
-const usdc_whale_address = '0x0a59649758aa4d66e25f08dd01271e891fe52199';
-const wbtc_whale_address = '0xccf4429db6322d5c611ee964527d42e5d685dd6a';
-const dai_whale_address = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643';
-const uni_whale_address = '0x1a9c8182c09f50c8318d769245bea52c32be35bc';
-const weth_whale_address = '0x030ba81f1c18d280636f32af80b9aad02cf0854e';
+// LOCALS OLD SCHOOL 
 
-var cons ={
-
-    uniswap: uni_address,
-    
-}
-
-var tick ={ returned:'dat'}
-var messageStruct = {
-    fn:'fetchTicker',
-    obj:tick , 
-    domain:this.domain
-}
-var routes = {
+var methods = {
     'init':init ,
     'base':init,
     'close':init,
@@ -42,14 +17,11 @@ var access_count = 0;
 var initObj;
 var provider = new ethers.providers.AlchemyProvider();
 
-onmessage = function(e) {
-    console.log('Worker Vehicle ETHERS: '+ wid+' Receives Message Data:', e.data );
-    
-    initObj = e.data;
-    var xclass = ( 'fn' in e.data ) ? e.data.fn : ( 'xclass' in e.data )? e.data.xclass : 'init';
-    
-    routes[ xclass ]( e.data );
-
+// ALL INCOMING MESSAGES ROUTED
+onmessage = incomingRequest;
+function incomingRequest( e ){
+    var xclass = ( 'method' in e.data ) ? e.data.method : ( 'fn' in e.data )? e.data.fn : 'init';
+    methods[ xclass ]( e.data );
 }
 
 
@@ -61,23 +33,23 @@ async function init( obj ){
     
     //provider.getBlockNumber().then( async (result) => {   console.log("Current block number: " + result);     });
     // USDT
-    var the_abi = await fetchAbi( cons[obj['carrier']] );
-    var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
+    //var the_abi = await fetchAbi( cons[obj['carrier']] );
+    //var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
     //var dec = await usdt.connect( provider ).decimals()
 
-    console.log(returnMethods(cont));
+    // console.log(returnMethods(cont));
 
-    var pm= await getPoolImmutables();
+    //var pm= await getPoolImmutables();
     
     // CALLBACK REPEAT 
-    var intervalID = setInterval( myCallback, 3500, 'Parameter 1', 'Parameter 2');
-    async function myCallback(a, b)
-    {
-        console.log(' worker: ', wid, self.hostname )
-        var whalbal = await cont.connect( provider ).balanceOf( uni_whale_address )
-        var blocknum = await  provider.getBlockNumber();
-        postMessage( { met:'block' ,  block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
-    }
+    // var intervalID = setInterval( myCallback, 3500, 'Parameter 1', 'Parameter 2');
+    // async function myCallback(a, b)
+    // {
+    //     console.log(' worker: ', wid, self.hostname )
+    //     var whalbal = await cont.connect( provider ).balanceOf( uni_whale_address )
+    //     var blocknum = await  provider.getBlockNumber();
+    //     postMessage( { met:'block' ,  block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
+    // }
 }
 
 
@@ -181,4 +153,11 @@ urllib.request( url , function (err, data, res) {
     var abi_obj = JSON.parse( data );
     resolve( JSON.parse( abi_obj.result ) ); //  
 }) 
+
+var tick ={ returned:'dat'}
+var messageStruct = {
+    fn:'fetchTicker',
+    obj:tick , 
+    domain:this.domain
+}
 */

@@ -15,21 +15,19 @@
 
     <body> 
 		<div>SRVX FABRIC RUNNER</div>		
-
-
-
-
+ 
 		
         <script type="module">
 			import KeyCache from './../util/keycache.js';
 			import fabric from './fabric.js';
-			var creds = new KeyCache();
-			creds.addItem( {dom:'binanceus' , ke:'xoxoox' , se:'sexexeses'} )
-			fabric.init( { creds:creds })
+			
 
 			window.addEventListener( 'load' , async function(){
-
-			    await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
+				var creds = new KeyCache();
+				await creds.loginAndLoad('x','x');
+				
+				fabric.init( { creds:creds })				
+				await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
 				await fabric.mergeIntent(  { method:'fetchTicker' , uuid:'0x1c2c2c22'   } );				
 
 			    fabric.addEventListener( 'fabricEvent' , function( e ){

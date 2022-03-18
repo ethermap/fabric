@@ -28,12 +28,21 @@ async function init( obj ){
     // CREATE DRIVER INSTANCE FIRST RUN 
     driver = new ccxt[ obj.carrier ]({ ...{} , ...{key:obj.ke,secret:obj.se} });
     initObj=obj;
+    fetchTicker( obj );
+
+
+    var intervalID = setInterval( myCallback, 8500, 'Parameter 1', 'Parameter 2');
+    async function myCallback(a, b)
+    {
+        console.log(' worker: ', wid )
+        fetchTicker( obj );
+    }
 }
 
 
 async function fetchTicker( obj ){
 
-    driver.fetchTicker('ETH/USD').then( function( tick ){
+    driver.fetchTicker( obj.symbol ).then( function( tick ){
         tick.domain = obj.domain;
         tick.symbol='ETH/USD';
         tick.method = 'fetchTicker';

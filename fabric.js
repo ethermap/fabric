@@ -8,14 +8,14 @@ _/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____
             \/    \/              \/                      \/ |__|       \/     \/    \/ */
 
 // LOCALS IN MOD SCOPE
-var procs = {};                         // ALL PROCESSES
-var eventer = new EventTarget();        // FABRIC EVENTER 
-var creds = false;                      // future cache ref 
-var input_to_request={                  // MAP-INTERACTION : FABRIC-REQUEST
-       init: 'init',                    // START PROCESS 
-focusObject: 'loadCluster' ,            // LOADS  Metadata about object + time series segment 
-objectAdded: 'loadSupportingObjectProc',   // fabric.publishIntent( vector:object )
-  mapLoaded: 'spawnAllSupportingObjects', //  fabric.
+var procs = {};                          // ALL PROCESSES
+var eventer = new EventTarget();         // FABRIC EVENTER 
+var creds = false;                       // future cache ref 
+var input_to_request={                   // MAP-INTERACTION : FABRIC-REQUEST
+       init: 'init',                     // START PROCESS 
+focusObject: 'loadCluster' ,             // LOADS  Metadata about object + time series segment 
+objectAdded: 'loadSupportingObjectProc', // fabric.publishIntent( vector:object )
+  mapLoaded: 'spawnAllSupportingObjects',//  fabric.
 }
 
 
@@ -23,7 +23,6 @@ objectAdded: 'loadSupportingObjectProc',   // fabric.publishIntent( vector:objec
 function init( initObj ){
     creds = initObj.creds; 
 }
-
 
 
 // GENERAL PROC START 
@@ -35,7 +34,8 @@ async function mergeIntent( intentObj ){
     var px2 = Object.assign({}, intentObj )         // "Object.assign"
     var px3 = JSON.parse(JSON.stringify(intentObj)) // "JSON"    
 
-    // AQUIRE PER UUID OR SPAWN: 
+    // AQUIRE TARGET PER UUID OR SPAWN: 
+    // ( SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
     var target_worker;
     if( procs[ intentObj.uuid ] ){
         target_worker = procs[ intentObj.uuid ].worker;
@@ -44,14 +44,12 @@ async function mergeIntent( intentObj ){
         const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
         const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
-        // var wrkr =  new Worker('./x_modules/fabric/vehicleb.js',{ type:'module' } );
-        target_worker = new Worker( driver_path   );  // MUST USE ABSO PATH 
+        target_worker = new Worker( driver_path   );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy
         procs[ intentObj.uuid ] = { worker:target_worker }; 
         target_worker.addEventListener("message", messageFromWorker );        
         target_worker.addEventListener("onerror", messageFromWorker );      
-        target_worker.postMessage( { ...px3 , ...creds.keySelect(  'dom' , intentObj.dom )  } )
+        target_worker.postMessage( { ...px3 , ...creds.keySelect(  'dom' , intentObj.dom )[0]  } )
     }
-
 }
 
 
@@ -67,6 +65,15 @@ function messageFromWorker( e ){
     dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
 }
 
+
+// SHOULD ENABLE WORKER TARGETTING BY ATTRIOBUTE
+function keySelect( k , v){
+    // by domain for general domain level request 
+    // by UUID for single individual 
+    // by symbol for broad multi-update // returned array iterate postMessage to all !! 
+    // by 
+    console.log(' key selecting by ',k);
+}
 
 function errorFromWorker( e ){
     console.log(' Fabric ERROR: ', e );
