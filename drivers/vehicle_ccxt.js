@@ -10,7 +10,13 @@ var driver;
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var initObj = {}
 var access_count = 0;
-var methods = { 'init':init, 'spawn':init , fetchTicker:fetchTicker };
+var methods = { 
+    init:init, 
+    spawn:init , 
+    fetchTicker:fetchTicker ,
+    fetchBalance:fetchBalance
+
+};
 
 
 // ALL INCOMING MESSAGES ROUTED
@@ -26,33 +32,46 @@ function incomingRequest( e ){
 // FUNCTIONAL METHODS: 
 async function init( obj ){
     // CREATE DRIVER INSTANCE FIRST RUN 
-    driver = new ccxt[ obj.carrier ]({ ...{} , ...{key:obj.ke,secret:obj.se} });
+    driver = new ccxt[ obj.carrier ]({ ...{} , ...{apiKey:obj.ke,secret:obj.se} , proxy:'http://localhost:8080/'});
     initObj=obj;
-    fetchTicker( obj );
+    //fetchTicker( obj );
 
 
     var intervalID = setInterval( myCallback, 8500, 'Parameter 1', 'Parameter 2');
     async function myCallback(a, b)
     {
         console.log(' worker: ', wid )
-        fetchTicker( obj );
+        //fetchTicker( obj );
     }
 }
 
 
 async function fetchTicker( obj ){
-
-    driver.fetchTicker( obj.symbol ).then( function( tick ){
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    driver.fetchTicker( obj.symbol ).then( async function( tick ){
         tick.domain = obj.domain;
         tick.symbol='ETH/USD';
         tick.method = 'fetchTicker';
         tick.uuid = initObj.uuid; 
-        postMessage( tick );    
+        postMessage( tick );
+        await sleep(15000)
+        fetchTicker( obj );
     });
 }
 
 
+async function fetchBalance( obj ){
+    driver.fetchBalance().then( function( balances ){
+        
+        balances.method = 'fetchBalances';
+        balances.uuid = initObj.uuid; 
+        postMessage( balances );    
+    });    
 
+    
+}
 
 
 

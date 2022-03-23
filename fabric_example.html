@@ -27,12 +27,16 @@
 				await creds.loginAndLoad('x','x');
 				
 				fabric.init( { creds:creds })				
-				await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
-				await fabric.mergeIntent(  { method:'fetchTicker' , uuid:'0x1c2c2c22'   } );				
+				//await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
+				
+				// init / launch of each worker should happen automatically based on existence of intent: 
+				await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt', method:'fetchTicker' , uuid:'0x1c2c2c22' ,symbol:'ETH/USDT'   } );
+				await fabric.mergeIntent(  { method:'fetchBalance'     , uuid:'0x1c2c2c22' , symbol:'ETH/USD'   } );
 
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
-			        console.log('')
+			        
 			        var data=e.detail;
+					console.log('Fabric: ',e.detail.method)
 			        var domain=data.domain;
 			        var symbol=data.symbol;
 			        var xclass=data.xclass; 

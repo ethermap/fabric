@@ -48,6 +48,10 @@ async function mergeIntent( intentObj ){
         procs[ intentObj.uuid ] = { worker:target_worker }; 
         target_worker.addEventListener("message", messageFromWorker );        
         target_worker.addEventListener("onerror", messageFromWorker );      
+
+        var launch_obj = px3;
+        launch_obj.method = 'init';
+        target_worker.postMessage( { ...launch_obj , ...creds.keySelect(  'dom' , intentObj.dom )[0]  } )
         target_worker.postMessage( { ...px3 , ...creds.keySelect(  'dom' , intentObj.dom )[0]  } )
     }
 }
@@ -55,7 +59,7 @@ async function mergeIntent( intentObj ){
 
 // EVENTS BUBBLING UP FROM WORKERS 
 function messageFromWorker( e ){
-    console.log(' Fabric Hears: ', e.data.domain , e.data.symbol , e.data );
+    console.log('Fabric: ', e.data.method  , e.data );
     var messageObject = e.data;
     if( messageObject.method == 'report'){
         procs[ messageObject.uuid ]['wid']=messageObject['wid'];
