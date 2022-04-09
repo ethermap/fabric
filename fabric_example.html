@@ -14,24 +14,27 @@
     </head>
 
     <body> 
-		<div>SRVX FABRIC RUNNER</div>		
- 
-		
+		<div>SRVX FABRIC RUNNER</div>
         <script type="module">
 			import KeyCache from './../util/keycache.js';
 			import fabric from './fabric.js';
-			
 
 			window.addEventListener( 'load' , async function(){
+				
 				var creds = new KeyCache();
 				await creds.loginAndLoad('x','x');
-				
-				fabric.init( { creds:creds })				
-				//await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
+
+				// WAIT
+				// SHould not pass creds ref ( keycache )
+				// to whole fabric? ( all creds don't need to be in )
+				// workers ? 
+				fabric.init( {creds:creds} )				
+				// await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
 				
 				// init / launch of each worker should happen automatically based on existence of intent: 
-				await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt', method:'fetchTicker' , uuid:'0x1c2c2c22' ,symbol:'ETH/USDT'   } );
-				await fabric.mergeIntent(  { method:'fetchBalance'     , uuid:'0x1c2c2c22' , symbol:'ETH/USD'   } );
+				await fabric.mergeIntent( { brand:'binanceus' , uuid:'0x1c2c2c22' , method:'fetchTicker' , symbol:'ETH/USDT'   } );
+				await fabric.mergeIntent( {                     uuid:'0x1c2c2c22' , method:'loadMarkets'     } );
+				//await fabric.mergeIntent(  { method:'fetchBalance'     , uuid:'0x1c2c2c22' , symbol:'ETH/USD'   } );
 
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
 			        

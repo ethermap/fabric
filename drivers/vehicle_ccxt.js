@@ -14,7 +14,8 @@ var methods = {
     init:init, 
     spawn:init , 
     fetchTicker:fetchTicker ,
-    fetchBalance:fetchBalance
+    fetchBalance:fetchBalance,
+    loadMarkets:loadMarkets
 
 };
 
@@ -32,7 +33,9 @@ function incomingRequest( e ){
 // FUNCTIONAL METHODS: 
 async function init( obj ){
     // CREATE DRIVER INSTANCE FIRST RUN 
-    driver = new ccxt[ obj.carrier ]({ ...{} , ...{apiKey:obj.ke,secret:obj.se} , proxy:'http://localhost:8080/'});
+    let cobj = ( 'apiKey' in obj ) ? {apiKey:obj.ke,secret:obj.se} : {}
+    driver = new ccxt[ obj.brand ]({ 
+        ...{} , ...cobj , proxy:'http://localhost:8080/'} );
     initObj=obj;
     //fetchTicker( obj );
 
@@ -45,6 +48,37 @@ async function init( obj ){
     }
 }
 
+async function loadMarkets( obj ){
+
+    //\ XIPIdIX /\\ 
+    driver.loadMarkets().then( function(obj){
+        console.log( obj );
+        var outObj ={}
+        outObj.payload = obj; 
+        outObj.uuid = initObj.uuid;
+        outObj.method = 'loadMarkets';
+        postMessage( outObj ); 
+    });
+}
+
+
+
+// YOU ARE HERE APRIL 8 
+// USING CURRENCIES INSTEAD OF loadMarkets
+// FASTER AND FEWER 
+// ALSO LIKELY EXPANDING SWITCH TO BALANCES INSTAD OF CURRENCES CAUSE MEM
+async function currencies( obj ){
+
+    //\ XIPIdIX /\\ 
+    //driver.loadMarkets().then( function(obj){
+        console.log( obj );
+        var outObj ={}
+        outObj.payload = obj; 
+        outObj.uuid = initObj.uuid;
+        outObj.method = 'currencies';
+        postMessage( outObj ); 
+    //});
+}
 
 async function fetchTicker( obj ){
     function sleep(ms) {
@@ -56,7 +90,7 @@ async function fetchTicker( obj ){
         tick.method = 'fetchTicker';
         tick.uuid = initObj.uuid; 
         postMessage( tick );
-        await sleep(15000)
+        await sleep(30000)
         fetchTicker( obj );
     });
 }
@@ -64,13 +98,10 @@ async function fetchTicker( obj ){
 
 async function fetchBalance( obj ){
     driver.fetchBalance().then( function( balances ){
-        
         balances.method = 'fetchBalances';
         balances.uuid = initObj.uuid; 
         postMessage( balances );    
     });    
-
-    
 }
 
 

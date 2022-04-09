@@ -1,4 +1,5 @@
 
+import * as ccx  from '/v_modules/ccxt.browser.js'
                                                                                         /*
   _____      ___.         .__                 _____                                     
 _/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____  ____  
@@ -25,6 +26,7 @@ function init( initObj ){
 }
 
 
+
 // GENERAL PROC START 
 async function mergeIntent( intentObj ){
     console.log(' merge Intent ', new Date().getTime() )    
@@ -42,7 +44,9 @@ async function mergeIntent( intentObj ){
         target_worker.postMessage( intentObj );
     }else{
         const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
-        const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
+        // IF DRIVER EXISTS IN CCXT instead // 
+        // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
+        const driver = ( intentObj.brand  in ccxt ) ? 'ccxt' : 'ethers';
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
         target_worker = new Worker( driver_path   );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy
         procs[ intentObj.uuid ] = { worker:target_worker }; 
@@ -75,8 +79,7 @@ function keySelect( k , v){
     // by domain for general domain level request 
     // by UUID for single individual 
     // by symbol for broad multi-update // returned array iterate postMessage to all !! 
-    // by 
-    console.log(' key selecting by ',k);
+    console.log(' key selecting by ', k );
 }
 
 function errorFromWorker( e ){
@@ -124,9 +127,9 @@ export default {
 
 
 
-    // FUTURE ENABLE ERROR TRACK 
-    // Worker.onerror        // ErrorEvent of type error event occurs.
-    // Worker.onmessage      // MessageEvent of type message occurs — i.e. when a message is sent to the parent document from the worker via DedicatedWorkerGlobalScope.postMessage. The message is stored in the event's data property.
-    // Worker.onmessageerror // 
-    //console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
-    //console.log( intentObj )
+// FUTURE ENABLE ERROR TRACK 
+// Worker.onerror        // ErrorEvent of type error event occurs.
+// Worker.onmessage      // MessageEvent of type message occurs — i.e. when a message is sent to the parent document from the worker via DedicatedWorkerGlobalScope.postMessage. The message is stored in the event's data property.
+// Worker.onmessageerror // 
+// console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
+// console.log( intentObj )
