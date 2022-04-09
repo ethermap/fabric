@@ -10,23 +10,30 @@ var driver;
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var initObj = {}
 var access_count = 0;
+
+// AVAILABLE 
 var methods = { 
     init:init, 
     spawn:init , 
-    fetchTicker:fetchTicker ,
-    fetchBalance:fetchBalance,
-    loadMarkets:loadMarkets
+    fetchTicker ,
+    fetchBalance ,
+    loadMarkets ,
+    currencies
 
 };
 
-
-// ALL INCOMING MESSAGES ROUTED
+// ALL INBOUND 
 onmessage = incomingRequest;
 function incomingRequest( e ){
     var xclass = ( 'method' in e.data ) ? e.data.method : ( 'fn' in e.data )? e.data.fn : 'init';
     methods[ xclass ]( e.data );
 }
+// ALL OUTBOUND
+function outboundPayload( obj ){
 
+    var outboundObject = { ...obj , uuid:initObj.uuid }
+    postMessage( outboundObject ); 
+}
 
 
 
@@ -71,12 +78,14 @@ async function currencies( obj ){
 
     //\ XIPIdIX /\\ 
     //driver.loadMarkets().then( function(obj){
-        console.log( obj );
-        var outObj ={}
-        outObj.payload = obj; 
-        outObj.uuid = initObj.uuid;
-        outObj.method = 'currencies';
-        postMessage( outObj ); 
+    console.log( obj );
+    var outObj ={}
+    outObj.payload = obj; 
+    outObj.uuid = initObj.uuid;
+    outObj.method = 'currencies';
+    postMessage( outObj ); 
+    
+    sendOutboundPayload( )
     //});
 }
 
