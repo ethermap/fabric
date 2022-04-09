@@ -32,6 +32,3 @@ fabric.mergeSequence( [ { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' },
 
 ### Appendix
 Basic input appendix
-
-### Joeys Edit
-Here's an edit
