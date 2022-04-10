@@ -74,19 +74,19 @@ async function loadMarkets( obj ){
 // USING CURRENCIES INSTEAD OF loadMarkets
 // FASTER AND FEWER 
 // ALSO LIKELY EXPANDING SWITCH TO BALANCES INSTAD OF CURRENCES CAUSE MEM
+// arg both necessary
 async function currencies( obj ){
 
     //\ XIPIdIX /\\ 
-    //driver.loadMarkets().then( function(obj){
-    console.log( obj );
-    var outObj ={}
-    outObj.payload = obj; 
-    outObj.uuid = initObj.uuid;
-    outObj.method = 'currencies';
-    postMessage( outObj ); 
-    
-    sendOutboundPayload( )
-    //});
+    driver.loadMarkets().then( function(obj){
+        //console.log( obj );
+        var outObj ={}
+        outObj.payload = driver.currencies; 
+        outObj.uuid = initObj.uuid;
+        outObj.method = 'currencies';
+        postMessage( outObj ); 
+        //sendOutboundPayload( )
+    });
 }
 
 async function fetchTicker( obj ){
