@@ -18,15 +18,17 @@ var methods = {
     fetchTicker ,
     fetchBalance ,
     loadMarkets ,
-    currencies
+    currencies,
+    balances,
+    defaultMethod
 
 };
 
 // ALL INBOUND 
 onmessage = incomingRequest;
 function incomingRequest( e ){
-    var xclass = ( 'method' in e.data ) ? e.data.method : ( 'fn' in e.data )? e.data.fn : 'init';
-    methods[ xclass ]( e.data );
+    var xmethod = ( 'method' in e.data ) ? e.data.method : 'defaultMethod';  // ( 'fn' in e.data )? e.data.fn : 'init';
+    methods[ xmethod ]( e.data );
 }
 // ALL OUTBOUND
 function outboundPayload( obj ){
@@ -40,12 +42,12 @@ function outboundPayload( obj ){
 // FUNCTIONAL METHODS: 
 async function init( obj ){
     // CREATE DRIVER INSTANCE FIRST RUN 
-    let cobj = ( 'apiKey' in obj ) ? {apiKey:obj.ke,secret:obj.se} : {}
-    driver = new ccxt[ obj.brand ]({ 
-        ...{} , ...cobj , proxy:'http://localhost:8080/'} );
+    let cobj = ( 'ke' in obj ) ? {apiKey:obj.ke,secret:obj.se} : {}
+    driver = new ccxt[ obj.brand ]({ ...{} , ...cobj , proxy:'http://localhost:8080/'} );
+    
     initObj=obj;
+    initObj['inserted_ke'] = obj.ke
     //fetchTicker( obj );
-
 
     var intervalID = setInterval( myCallback, 8500, 'Parameter 1', 'Parameter 2');
     async function myCallback(a, b)
@@ -53,6 +55,11 @@ async function init( obj ){
         console.log(' worker: ', wid )
         //fetchTicker( obj );
     }
+}
+
+async function defaultMethod( obj ){
+
+    console.log(' default Method called on vehicle CCXT with: ', obj )
 }
 
 async function loadMarkets( obj ){
@@ -82,7 +89,7 @@ async function currencies( obj ){
         //console.log( obj );
         var outObj ={}
         outObj.payload = driver.currencies; 
-        outObj.uuid = initObj.uuid;
+        outObj.uuid = initObj.id;
         outObj.method = 'currencies';
         postMessage( outObj ); 
         //sendOutboundPayload( )
@@ -93,26 +100,52 @@ async function fetchTicker( obj ){
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
-    driver.fetchTicker( obj.symbol ).then( async function( tick ){
-        tick.domain = obj.domain;
-        tick.symbol='ETH/USD';
-        tick.method = 'fetchTicker';
-        tick.uuid = initObj.uuid; 
-        postMessage( tick );
-        await sleep(30000)
-        fetchTicker( obj );
-    });
+    driver.fetchTicker( obj.symbol ).then( 
+        async function( tick ){
+            tick.domain = obj.domain;
+            tick.symbol='ETH/USD';
+            tick.method = 'fetchTicker';
+            tick.uuid = initObj.id; 
+            postMessage( tick );
+            await sleep(30000)
+            fetchTicker( obj );
+        },
+        async function( reason ){
+
+            console.log( 'vehicle fail reason: ', reason )
+        }
+    );
 }
 
 
 async function fetchBalance( obj ){
-    driver.fetchBalance().then( function( balances ){
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    // 
+    driver.fetchBalance().then( 
+        // FULLFILLMENT: 
+        async function( balances ){
+            balances.method = 'fetchBalances';
+            balances.uuid = initObj.id; 
+            postMessage( balances );    
+            await sleep(5000)
+            fetchBalance()
+        },
+        // INCOMPLETE:
+        async function( reason ){
+
+            console.log( 'vehicle fail reason: ', reason )
+        });    
+}
+
+async function balances( ob ){
+    driver.fetchBalance().then( async function( balances ){
         balances.method = 'fetchBalances';
-        balances.uuid = initObj.uuid; 
+        balances.uuid = initObj.id; 
         postMessage( balances );    
     });    
 }
-
 
 
 

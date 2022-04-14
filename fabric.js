@@ -53,10 +53,12 @@ async function mergeIntent( intentObj ){
         target_worker.addEventListener("message", messageFromWorker );        
         target_worker.addEventListener("onerror", messageFromWorker );      
 
-        var launch_obj = px3;
-        launch_obj.method = 'init';
-        target_worker.postMessage( { ...launch_obj , ...creds.keySelect(  'dom' , intentObj.dom )[0]  } )
-        target_worker.postMessage( { ...px3 , ...creds.keySelect(  'dom' , intentObj.dom )[0]  } )
+
+        // UNREGISTERED WORKER MUST FIRE INIT BEFORE FINAL ( init last to overwrite )
+        target_worker.postMessage( { ...px3 , method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]  } )
+        // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
+        target_worker.postMessage( px3 )
+        // creds could be expanded to creds.keySelect( ['dom','domain','brand'] )
     }
 }
 
@@ -78,7 +80,8 @@ function messageFromWorker( e ){
 function keySelect( k , v){
     // by domain for general domain level request 
     // by UUID for single individual 
-    // by symbol for broad multi-update // returned array iterate postMessage to all !! 
+    // by symbol for broad multi-update 
+    // returned array iterate postMessage to all !! 
     console.log(' key selecting by ', k );
 }
 
@@ -133,3 +136,7 @@ export default {
 // Worker.onmessageerror // 
 // console.log( 'publishing Intent Into the fabric by address and target fn or xclass ');
 // console.log( intentObj )
+
+        // OOPS ERROR CAUSE JS SET BY REFERENCE 
+        // var launch_obj = px3;
+        // launch_obj.method = 'init';

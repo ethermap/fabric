@@ -21,7 +21,12 @@ var provider = new ethers.providers.AlchemyProvider();
 onmessage = incomingRequest;
 function incomingRequest( e ){
     var xclass = ( 'method' in e.data ) ? e.data.method : ( 'fn' in e.data )? e.data.fn : 'init';
-    methods[ xclass ]( e.data );
+    try {
+        methods[ xclass ]( e.data );
+    }catch( err ){
+        console.log(' err in ethers vehicle: ', err)
+    }
+  
 }
 
 
