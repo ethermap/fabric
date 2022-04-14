@@ -1,7 +1,7 @@
 
 
 ## Fabric 
-![TFx](https://raw.githubusercontent.com/psytron/fabric/main/tfx.jpg)
+![TFx](https://raw.githubusercontent.com/psytron/fabric/main/meta/tfx.jpg)
 
 #### Serice Worker Message Cue
 Event based and process manager for [Mozilla Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
