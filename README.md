@@ -1,6 +1,6 @@
 
 
-## Service Fabric 
+## Fabric 
 ![TFx](https://raw.githubusercontent.com/psytron/fabric/main/tfx.jpg)
 
 #### Serice Worker Message Cue
