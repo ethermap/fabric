@@ -126,7 +126,7 @@ async function fetchBalance( obj ){
     driver.fetchBalance().then( 
         // FULLFILLMENT: 
         async function( balances ){
-            balances.method = 'fetchBalances';
+            balances.method = 'fetchBalance';
             balances.uuid = initObj.id; 
             postMessage( balances );    
             await sleep(5000)
@@ -141,7 +141,7 @@ async function fetchBalance( obj ){
 
 async function balances( ob ){
     driver.fetchBalance().then( async function( balances ){
-        balances.method = 'fetchBalances';
+        balances.method = 'fetchBalance';
         balances.uuid = initObj.id; 
         postMessage( balances );    
     });    
