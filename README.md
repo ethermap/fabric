@@ -1,5 +1,5 @@
 ## Transactional Fabric
-[Structured Clone](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) compatible async [Event Target](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) based process manager for [Service Workers] (https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) with [LavaMoat](https://github.com/LavaMoat/LavaMoat) and [Global Scope](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope) scope isolation. 
+[Structured Clone](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) compatible [Event Target](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) process manager for [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) with [LavaMoat](https://github.com/LavaMoat/LavaMoat) and [Global Scope](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope) scope isolation. 
 
 
 Install
