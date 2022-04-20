@@ -1,5 +1,5 @@
 ## Transactional Fabric
-[Structured Clone](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) compatible process manager for [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API). Features automatic worker spawning for nonexistent service identifiers, super standard [Event Target](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) interface, scope isolation with [LavaMoat](https://github.com/LavaMoat/LavaMoat) and [Global Scope](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope) for seperation of sensitive credentials, and configurable credential provider. 
+Simple automatic process manager for isolated [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) instances. Features [Structured Clone](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) compatible, automatic worker spawning for nonexistent service identifiers, standard [Event Target](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) interface, scope isolation with [LavaMoat](https://github.com/LavaMoat/LavaMoat) and [Global Scope](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope) for seperation of sensitive credentials, and configurable credential provider. 
 
 
 Install
