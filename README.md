@@ -13,8 +13,10 @@ git submodule add git@github.com:psytron/fabric path/to/project
 Basic Usage: 
 
 ```javascript
+// IMPORT 
 import fabric from './fabric' 
 
+// SUBSCRIBE EVENT LISTENERS
 fabric.addEventListener( 'fabricEvent' , yourApp.action );
 fabric.addEventListener( 'fabricEvent' , function( e ){
     let message = e.detail;
@@ -23,6 +25,7 @@ fabric.addEventListener( 'fabricEvent' , function( e ){
     message.payload // COMPLETED SERVICE RESPONSE
 });
 
+// MERGE INTENTS ROUTED TO SERVICES
 fabric.mergeIntent(  { method:'fetchOrders' , domain:'ethereum' , symbol:'ETH/USD' } );
 fabric.mergeIntent(  { method:'fetchTicker' , domain:'binanceus', symbol:'BTC/USD' } );
 fabric.mergeSequence( [ { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' }, 
