@@ -20,7 +20,8 @@ var methods = {
     loadMarkets ,
     currencies,
     balances,
-    defaultMethod
+    defaultMethod,
+    timeSeries
 
 };
 
@@ -126,6 +127,32 @@ async function fetchTicker( obj ){
     );
 }
 
+async function timeSeries( obj ){
+
+    //driver.fetchOHLCV ('ETH/BTC', '1m')[0]
+    console.log(' timeSeries ')
+    // JavaScript
+    let sleep = (ms) => new Promise (resolve => setTimeout (resolve, ms));
+
+    if ( driver.has.fetchOHLCV) {
+
+        await sleep ( driver.rateLimit) // milliseconds
+        var OHLCV = await driver.fetchOHLCV ( obj.symbol, '1h')
+        console.log ( OHLCV ) // one minute        
+
+        var outObj = {}
+        outObj.method = obj.method;
+        outObj.uuid = obj.uuid;
+        outObj.meta = { symbol:obj.symbol };
+        outObj.payload = OHLCV;
+        postMessage( outObj );        
+        // for (symbol in driver.markets) {
+        //     await sleep ( driver.rateLimit) // milliseconds
+        //     var OHLCV = await driver.fetchOHLCV ( obj.symbol, '1m')
+        //     console.log ( OHLCV ) // one minute
+        // }
+    }    
+}
 
 async function fetchBalance( obj ){
     function sleep(ms) {
