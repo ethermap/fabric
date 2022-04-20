@@ -41,20 +41,29 @@ function outboundPayload( obj ){
 
 // FUNCTIONAL METHODS: 
 async function init( obj ){
+    
     // CREATE DRIVER INSTANCE FIRST RUN 
     let cobj = ( 'ke' in obj ) ? {apiKey:obj.ke,secret:obj.se} : {}
+
+    // SILLY EXCEPTION FOR CBP
+    if('pw' in obj ){ cobj.password = obj.pw }
+    
+    // SPAWN DRIVER
     driver = new ccxt[ obj.brand ]({ ...{} , ...cobj , proxy:'http://localhost:8080/'} );
     
-    initObj=obj;
-    initObj['inserted_ke'] = obj.ke
-    //fetchTicker( obj );
 
-    var intervalID = setInterval( myCallback, 8500, 'Parameter 1', 'Parameter 2');
-    async function myCallback(a, b)
-    {
-        console.log(' worker: ', wid )
-        //fetchTicker( obj );
-    }
+    // TO REMOVE 
+    // DEBUG SAVE OBJECT IN SCOPE 
+    initObj=obj;
+    //initObj['inserted_ke'] = obj.ke
+    //fetchTicker( obj );
+    // TEST INTERVAL EMIT TEST EVENT 
+    //var intervalID = setInterval( myCallback, 8500, 'Parameter 1', 'Parameter 2');
+    //async function myCallback(a, b)
+    //{
+    //  console.log(' worker: ', wid )
+    //  fetchTicker( obj );
+    //}
 }
 
 async function defaultMethod( obj ){
