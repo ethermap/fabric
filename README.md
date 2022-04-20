@@ -32,6 +32,9 @@ fabric.mergeSequence( [ { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' 
                         { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' } ] );
 ```
 
+### Documentation
+Fabric will check vault or provider for available stored credentials and merge those at the time of worker spawning. This means you can spawn workers without credentials and as long as the underlying services support public access everything will flow smoothly. Fabric can aggregate events into specific channels or into a single event listener to route to your app. 
+
 ### Appendix
 Basic input appendix
 
