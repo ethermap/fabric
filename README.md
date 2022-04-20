@@ -17,18 +17,22 @@ Basic Usage:
 ```javascript
 import fabric from './fabric' 
 
-fabric.mergeIntent(  { fn:'init' , domain:'ethereum' , symbol:'ETH/USD' } );
-fabric.mergeIntent(  { fn:'init' , domain:'binanceus', symbol:'BTC/USD' } );
-fabric.addEventListener( 'channelEvent' , function( e ){} );
-fabric.addEventListener( 'channelEvent' , yourApp.pubSubHook );
+fabric.addEventListener( 'fabricEvent' , yourApp.action );
+fabric.addEventListener( 'fabricEvent' , function( e ){
+    let message = e.detail;
+    message.uuid    // UUID OF ENTITY 
+    message.method  // METHOD BEING CALLED 
+    message.payload // COMPLETED SERVICE RESPONSE
+});
 
-fabric.mergeSequence( [ { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' }, 
-                        { fn:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' } ] );
+fabric.mergeIntent(  { method:'fetchOrders' , domain:'ethereum' , symbol:'ETH/USD' } );
+fabric.mergeIntent(  { method:'fetchTicker' , domain:'binanceus', symbol:'BTC/USD' } );
+fabric.mergeSequence( [ { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' }, 
+                        { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' } ] );
 ```
 
 ### Appendix
 Basic input appendix
-
 
 
 ## Fabric 
