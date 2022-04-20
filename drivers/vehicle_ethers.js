@@ -3,8 +3,13 @@
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
 
-// LOCALS OLD SCHOOL 
 
+
+// ETHES 
+// brand e.g. Uniswap 
+// contract_address 
+
+// LOCALS OLD SCHOOL 
 var methods = {
     'init':init ,
     'base':init,
