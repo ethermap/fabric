@@ -11,6 +11,10 @@ var wid = 'w'+ Math.round( Math.random()*9999 );
 var initObj = {}
 var access_count = 0;
 
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
 // AVAILABLE 
 var methods = { 
     init:init, 
@@ -21,7 +25,8 @@ var methods = {
     currencies,
     balances,
     defaultMethod,
-    timeSeries
+    timeSeries,
+    pricedBalances
 
 };
 
@@ -106,10 +111,100 @@ async function currencies( obj ){
     });
 }
 
-async function fetchTicker( obj ){
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+async function pricedBalances( obj ){
+
+    // GET Markets if not loaded 
+
+    var responseObj={};
+    responseObj.method = 'pricedBalances'
+    responseObj.uuid = obj.id; 
+
+    driver.fetchBalance().then( 
+        // FULLFILLMENT: 
+
+        
+        async function( balances ){
+            balances.method = 'fetchBalance';
+            
+            //postMessage( balances );    
+
+            console.log( balances.info )
+            var processedBalances={}
+            for( var b in balances.info ){
+                    
+                let bnod = balances.info[b]
+                let base = bnod.currency
+                if( bnod.balance > 0 ){
+                    processedBalances[ base ]=bnod    
+                }
+                
+                
+            }
+
+            var groupedTickers={}
+            if( driver.has.fetchTickers ){
+
+                driver.fetchTickers().then( ( tickers ) => {
+
+                    console.log( tickers )
+                    for( var t in tickers ){
+                        let qnod = tickers[t]
+                        let base = t.split("/")[0]
+                        let quot = t.split("/")[1]
+                        
+                        if( base in groupedTickers ){
+                            groupedTickers[ base ][ quot ] = qnod
+                        }else{
+                            groupedTickers[ base ]= { quot:qnod }
+                        }
+
+                        // Maybe can just insert stuff into processed Balances:
+
+                        if( processedBalances[ base ] && quot == 'USD' ){
+                            processedBalances[ base ][qnod.symbol]=qnod
+                        }
+                    }
+                    
+                    // ok now merge price_per_unit into each asset apiKey//
+                    // ob[ base ] 
+                    var k = 5;
+                    
+                })
+            }else{
+                console.log(' no multi ticker available ')
+            }
+
+            
+            await sleep(15000)
+            pricedBalances()
+        },
+        // INCOMPLETE:
+        async function( reason ){
+
+            console.log( 'vehicle fail reason: ', reason )
+        });    
+
+    
+    if( driver.markets ){
+
+        if( driver.has.fetchTickers ){
+            driver.fetchTickers().then( function(e){
+
+
+                console.log( e )
+            })
+            
+        }
     }
+    // get Balances per Credential 
+    // 
+    // build payload array of priced Balances 
+
+
+}
+
+async function fetchTicker( obj ){
+
     driver.fetchTicker( obj.symbol ).then( 
         async function( tick ){
             tick.domain = obj.domain;
@@ -145,7 +240,8 @@ async function timeSeries( obj ){
         outObj.uuid = obj.uuid;
         outObj.meta = { symbol:obj.symbol };
         outObj.payload = OHLCV;
-        postMessage( outObj );        
+        
+        postMessage( outObj );
         // for (symbol in driver.markets) {
         //     await sleep ( driver.rateLimit) // milliseconds
         //     var OHLCV = await driver.fetchOHLCV ( obj.symbol, '1m')
