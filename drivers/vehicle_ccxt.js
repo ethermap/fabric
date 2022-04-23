@@ -9,6 +9,7 @@ importScripts('/x_modules/fabric/misc.js');
 var driver;
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var initObj = {}
+var cache ={}
 var access_count = 0;
 
     function sleep(ms) {
@@ -111,13 +112,33 @@ async function currencies( obj ){
     });
 }
 
+function getCachedMethod( method ){
+
+    if( method in cache ){
+        return cache[ method ]
+    }else{
+        return false 
+    }
+}
+
+
+
 async function pricedBalances( obj ){
 
     // GET Markets if not loaded 
 
     var responseObj={};
-    responseObj.method = 'pricedBalances'
+    responseObj.method = obj.method
     responseObj.uuid = obj.id; 
+
+    // THIS SHOULD BE COMPARTMENTALIzED DOWN TO ONE LINER: 
+    // 
+    
+    var cachedPayload = getCachedMethod( obj.method )
+    if( cachedPayload ){
+        responseObj.payload = cachedPayload 
+        postMessage( responseObj );
+    }
 
     driver.fetchBalance().then( 
         // FULLFILLMENT: 
@@ -130,12 +151,12 @@ async function pricedBalances( obj ){
 
             console.log( balances.info )
             var processedBalances={}
-            for( var b in balances.info ){
+            for( var b in balances.total ){
                     
-                let bnod = balances.info[b]
-                let base = bnod.currency
-                if( bnod.balance > 0 ){
-                    processedBalances[ base ]=bnod    
+                let bval = balances.total[b]
+                let base = b
+                if( bval > 0 ){
+                    processedBalances[ base ]={ balance:bval }   
                 }
                 
                 
@@ -146,37 +167,44 @@ async function pricedBalances( obj ){
 
                 driver.fetchTickers().then( ( tickers ) => {
 
-                    console.log( tickers )
+                    // ITERATE TICKERS AND INSERT INTO BALANCES
                     for( var t in tickers ){
                         let qnod = tickers[t]
                         let base = t.split("/")[0]
                         let quot = t.split("/")[1]
-                        
-                        if( base in groupedTickers ){
-                            groupedTickers[ base ][ quot ] = qnod
-                        }else{
-                            groupedTickers[ base ]= { quot:qnod }
+
+                        // INJECT EACH TICKER BY QUOTE INTO AVAILABLE BASES
+                        if( processedBalances[ base ] ){
+                            processedBalances[ base ][ quot ]=qnod
                         }
-
-                        // Maybe can just insert stuff into processed Balances:
-
-                        if( processedBalances[ base ] && quot == 'USD' ){
-                            processedBalances[ base ][qnod.symbol]=qnod
+                        
+                        // INSERT usd_unit 
+                        if( processedBalances[ base ] && (quot == 'USD' || quot == 'USDT') ){
+                            processedBalances[ base ]['usd_cost']=qnod.last;
+                            processedBalances[ base ]['usd_value']=( processedBalances[ base ].balance * qnod.last );
                         }
                     }
                     
                     // ok now merge price_per_unit into each asset apiKey//
                     // ob[ base ] 
+                    // HEERE it could GET MORE INTERESTING AND SUM Total of Value 
                     var k = 5;
-                    
+                    responseObj.payload = processedBalances;
+                    postMessage( responseObj );
+                    cache[ responseObj.method ] = processedBalances; 
                 })
             }else{
                 console.log(' no multi ticker available ')
             }
-
             
-            await sleep(15000)
-            pricedBalances()
+            // if( base in groupedTickers ){
+            //     groupedTickers[ base ]={}
+            //     groupedTickers[ base ][ quot ] = qnod
+            // }else{
+            //     groupedTickers[ base ]= { quot:qnod }
+            // }
+            // await sleep(15000)
+            // pricedBalances( this.initObj )
         },
         // INCOMPLETE:
         async function( reason ){
