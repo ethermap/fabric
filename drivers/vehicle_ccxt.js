@@ -122,44 +122,57 @@ function getCachedMethod( method ){
 }
 
 
+// INSTANT POST OF CACHED DATA FOR FAST UI DURING LOADING 
+function cacheBusPost( obj ){
+
+    
+    if( obj.payload ){ // IF MESSAGE HAS PAYLOAD UPDATE CACHE AND SEND 
+        
+        cache[ obj.method ] = obj.payload;
+        postMessage( obj );
+        
+    }else if( obj.method in cache ){ // IF NO PAYLOAD BUT CACHED SEND CACHE 
+        
+        obj.payload = cache[ obj.method ]
+        postMessage( obj )
+        
+    }else{ // DO NOTHING 
+        return false 
+    }
+}
+
+
 
 async function pricedBalances( obj ){
 
-    // GET Markets if not loaded 
 
     var responseObj={};
     responseObj.method = obj.method
     responseObj.uuid = obj.id; 
 
-    // THIS SHOULD BE COMPARTMENTALIzED DOWN TO ONE LINER: 
-    // 
+    cacheBusPost( responseObj )
     
-    var cachedPayload = getCachedMethod( obj.method )
-    if( cachedPayload ){
-        responseObj.payload = cachedPayload 
-        postMessage( responseObj );
-    }
+    // GET Markets if not loaded 
+    // THIS SHOULD BE COMPARTMENTALIzED DOWN TO ONE LINER: 
+    //     
+    // var cachedPayload = getCachedMethod( obj.method )
+    // if( cachedPayload ){
+    //     responseObj.payload = cachedPayload 
+    //     postMessage( responseObj );
+    // }
 
     driver.fetchBalance().then( 
         // FULLFILLMENT: 
-
-        
         async function( balances ){
             balances.method = 'fetchBalance';
-            
-            //postMessage( balances );    
-
             console.log( balances.info )
             var processedBalances={}
             for( var b in balances.total ){
-                    
                 let bval = balances.total[b]
                 let base = b
                 if( bval > 0 ){
                     processedBalances[ base ]={ balance:bval }   
                 }
-                
-                
             }
 
             var groupedTickers={}
@@ -190,8 +203,9 @@ async function pricedBalances( obj ){
                     // HEERE it could GET MORE INTERESTING AND SUM Total of Value 
                     var k = 5;
                     responseObj.payload = processedBalances;
-                    postMessage( responseObj );
-                    cache[ responseObj.method ] = processedBalances; 
+                    //postMessage( responseObj );
+                    cacheBusPost( responseObj )
+                    //cache[ responseObj.method ] = processedBalances; 
                 })
             }else{
                 console.log(' no multi ticker available ')
@@ -253,23 +267,25 @@ async function fetchTicker( obj ){
 async function timeSeries( obj ){
 
     //driver.fetchOHLCV ('ETH/BTC', '1m')[0]
-    console.log(' timeSeries ')
+    // console.log(' timeSeries ')
     // JavaScript
     let sleep = (ms) => new Promise (resolve => setTimeout (resolve, ms));
-
+    
+    var outObj = {}
+    outObj.method = obj.method;
+    outObj.uuid = obj.uuid;
+    outObj.meta = { symbol:obj.symbol };
+    
+    cacheBusPost( outObj )
+    
     if ( driver.has.fetchOHLCV) {
-
-        await sleep ( driver.rateLimit) // milliseconds
+        //await sleep ( driver.rateLimit) // milliseconds
         var OHLCV = await driver.fetchOHLCV ( obj.symbol, '1h')
-        console.log ( OHLCV ) // one minute        
-
-        var outObj = {}
-        outObj.method = obj.method;
-        outObj.uuid = obj.uuid;
-        outObj.meta = { symbol:obj.symbol };
         outObj.payload = OHLCV;
+        cacheBusPost( outObj )
         
-        postMessage( outObj );
+        //console.log ( OHLCV ) // one minute        
+        // postMessage( outObj );
         // for (symbol in driver.markets) {
         //     await sleep ( driver.rateLimit) // milliseconds
         //     var OHLCV = await driver.fetchOHLCV ( obj.symbol, '1m')
