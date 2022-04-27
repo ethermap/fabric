@@ -2,14 +2,13 @@
 // OLD SCHOOL IMPORTS 
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
+//   ADDRESS:  Contract can map across other networks points to Address
+//   BRAND:    Can apply to Tokens, Dexes, Networks 
+//   DRIVER:   Default Ethers but what about others ? 
+//   SYMBOL:   Each Wallet can have multiples ?
+//   Address of contract VS. Address of wallet / priv_key 
 
 
-
-// ETHES 
-// brand e.g. Uniswap 
-// contract_address 
-
-// LOCALS OLD SCHOOL 
 var methods = {
     'init':init ,
     'base':init,
@@ -18,7 +17,6 @@ var methods = {
 }
 var wid = 'w'+ Math.round( Math.random()*9999 );
 var access_count = 0;
-
 var initObj;
 var provider = new ethers.providers.AlchemyProvider();
 
@@ -37,20 +35,20 @@ function incomingRequest( e ){
 
 
 async function init( obj ){
-    console.log( ' init in Worker: ', wid , this , self );
-    postMessage( { met:'report' ,  wid:wid ,  domain:'ethers' } );
-
     
-    //provider.getBlockNumber().then( async (result) => {   console.log("Current block number: " + result);     });
-    // USDT
-    //var the_abi = await fetchAbi( cons[obj['carrier']] );
-    //var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
-    //var dec = await usdt.connect( provider ).decimals()
-
+    // console.log( ' init in Worker: ', wid , this , self );
+    
+    // THIS  DRIVES PROC LIST in QNAV ( COULD BE SUPERCLASS IN FUTURE )
+    postMessage( { met:'report' ,  wid:wid ,  driver:'ethers',  domain:'ethers' } );
+ 
+    // var the_abi = await fetchAbi( cons[obj['carrier']] );
+    // var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
+    // var dec = await usdt.connect( provider ).decimals()
+    // provider = new ethers.providers.AlchemyProvider();
+    // provider =  new ethers.providers.JsonRpcProvider('https://poly/gon/rpc'); 
+    // provider =  new ethers.providers.JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc');  
     // console.log(returnMethods(cont));
-
-    //var pm= await getPoolImmutables();
-    
+    // var pm= await getPoolImmutables();
     // CALLBACK REPEAT 
     // var intervalID = setInterval( myCallback, 3500, 'Parameter 1', 'Parameter 2');
     // async function myCallback(a, b)
@@ -60,10 +58,45 @@ async function init( obj ){
     //     var blocknum = await  provider.getBlockNumber();
     //     postMessage( { met:'block' ,  block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
     // }
+  
+    provider =  new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
+    var walletPrivateKey = new ethers.Wallet( obj.se ); // D6D5
+    wallet = walletPrivateKey.connect(provider)  
+    var blocknum = await  provider.getBlockNumber();  
+    var bal = await wallet.getBalance();
+    var balf = ethers.utils.formatEther(bal);
+
+
+  
+    // BALANCE OF TOKEN AND NATIVE 
+    // ERC20 and AVAX on TESTNET  or ENS: 
+    var daiAddress = "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70";
+    var daiAddressTest = '0x34B6C87bb59Eb37EFe35C8d594a234Cd8C654D50';
+
+    daiAddress = daiAddressTest;
+ 
+    const daiAbi = [
+      "function name() view returns (string)",
+      "function symbol() view returns (string)",
+      "function balanceOf(address) view returns (uint)",
+      "function transfer(address to, uint amount)",
+      "event Transfer(address indexed from, address indexed to, uint amount)"
+    ];
+
+    
+
+
+    const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
+
+      
+    var sm = await daiContract.symbol()
+    balance = await daiContract.balanceOf( wallet.address )
+    ethers.utils.formatUnits(balance, 18)
+    var l = 4;
 }
 
 
-const returnMethods = (obj = {}) => {
+const returnMethods = ( obj = {} )=>{
    const members = Object.getOwnPropertyNames(obj);
    const methods = members.filter(el => {
       return typeof obj[el] === 'function';
@@ -72,11 +105,15 @@ const returnMethods = (obj = {}) => {
 };
 
 
-
+// LOAD ABI FROM REMOTE 
 async function fetchAbi( addr_in ){
+    // MAKE THIS MORE ROBUST WITH FALLBACKS TO LOCAL // 
+    // OTHER SOURCES FOR OTHER NETWORKS 
+    // INTERNAL MAP 
+    var address_of_contract = addr_in; 
     var prom = new Promise( async ( resolve, reject ) => {
         var esk = '6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
-        var url = "https://api.etherscan.io/api?module=contract&action=getabi&address="+addr_in+"&apikey=6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2";
+        var url = 'https://api.etherscan.io/api?module=contract&action=getabi&address="+address_of_contract+"&apikey=6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
         var options = { json: true };
         const response = await fetch( url );
         const ab = await response.json();
@@ -85,6 +122,19 @@ async function fetchAbi( addr_in ){
     return prom;
 }
 
+// CALL FUNCTION SANS ABI
+function call_sig( method_name , types_arr , vals_arr  ){
+  var types_array = types_arr;
+  var types_array_string = types_array.join(',');
+  var funcSig = method_name + '('+types_array_string+')';
+  let funcBytes = ethers.utils.toUtf8Bytes( funcSig );
+  var funcKeccak = ethers.utils.keccak256( funcBytes );
+  var funcSegment = funcKeccak.slice(0,10);
+  let bbPack = ethers.utils.solidityPack(
+      [ 'bytes4', ...types_arr ], 
+      [ funcSegment, ...vals_arr ] );
+  return bbPack;
+}
 
 //import { ethers } from "ethers";
 //import { Address } from "cluster";
@@ -92,7 +142,6 @@ async function fetchAbi( addr_in ){
 //const provider = new ethers.providers.JsonRpcProvider("<YOUR_ENDPOINT_HERE>");
 
 const poolAddress = "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8";
-
 const poolImmutablesAbi = [
   "function factory() external view returns (address)",
   "function token0() external view returns (address)",
@@ -101,21 +150,11 @@ const poolImmutablesAbi = [
   "function tickSpacing() external view returns (int24)",
   "function maxLiquidityPerTick() external view returns (uint128)",
 ];
-
 const poolContract = new ethers.Contract(
   poolAddress,
   poolImmutablesAbi,
   provider
 );
-
-// interface Immutables {
-//   factory: Address;
-//   token0: Address;
-//   token1: Address;
-//   fee: number;
-//   tickSpacing: number;
-//   maxLiquidityPerTick: number;
-// }
 
 async function getPoolImmutables() {
   const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] =
@@ -170,4 +209,25 @@ var messageStruct = {
     obj:tick , 
     domain:this.domain
 }
+
+    // The Contract object
+    // Read-Only Methods
+    // Querying the DAI Contract
+    // Get the ERC-20 token name
+    // var nm = await daiContract.name()
+    // Dai Stablecoin
+    // Get the ERC-20 token symbol (for tickers and UIs)
+    // DAI
+    // Get the balance of an address
+    // BigNumber: "8501797437309328201631" 
+    // Format the DAI for displaying to the user  
 */
+
+// interface Immutables {
+//   factory: Address;
+//   token0: Address;
+//   token1: Address;
+//   fee: number;
+//   tickSpacing: number;
+//   maxLiquidityPerTick: number;
+// }

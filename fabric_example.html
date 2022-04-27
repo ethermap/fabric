@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    
     <head>
 		<title>Fabric Example</title>
 		<base href="" target="_blank">
@@ -16,6 +15,7 @@
     <body> 
 		<div>SRVX FABRIC RUNNER</div>
         <script type="module">
+			
 			import KeyCache from './../util/keycache.js';
 			import fabric from './fabric.js';
 
@@ -29,17 +29,21 @@
 				
 				// SIGNING CREDENTIALS PROVIDER
 				var creds = new KeyCache();
-				await creds.loginAndLoad('x','x');
+				await creds.loginAndLoad( [ ...String(window.location) ][47] ,[ ...String(window.location) ][47]);
 
-				// WAIT
+				// loginAndLoad(  return_pair() )
+				// loginAndLoad( hash_param_1 <<< *3, hash_param_2 >>> *3 )
+				// loginAndLoad( hash_param_1 <<< *3, hash_param_2 >>> *3 )
+
+				// WAIT // 
 				// SHould not pass creds ref ( keycache )
-				// to whole fabric? ( all creds don't need to be in )
-				// workers ? 
-				fabric.init( {creds:creds} )				
+				fabric.init( {creds:creds} )	
+				// fabric.signer( creds ) 
+				// fabric.singer( vault )			
 				// await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
-				
 				// init / launch of each worker should happen automatically based on existence of intent: 
-				await fabric.mergeIntent( { brand:'coinbasepro' , uuid:'0x1c2c2c22' , method:'pricedBalances' , symbol:'ETH/USDT'   } );
+				// await fabric.mergeIntent( { brand:'ethereum' , uuid:'0x1c2c2c22' , symbol:'ETH/USDT'   } )
+				await fabric.mergeIntent( { brand:'ethereum' , uuid:'0x1c2c2c22' , symbol:'AVAX'   } );
 
 
 				//await delay(12000);
@@ -57,7 +61,6 @@
 			        var i=0;
 			    })						
 			});
-			
 		</script>
 
 

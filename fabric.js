@@ -9,25 +9,44 @@ _/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____
             \/    \/              \/                      \/ |__|       \/     \/    \/ */
 
 // LOCALS IN MOD SCOPE
-var procs = {};                          // ALL PROCESSES
-var eventer = new EventTarget();         // FABRIC EVENTER 
-var creds = false;                       // future cache ref 
-var input_to_request={                   // MAP-INTERACTION : FABRIC-REQUEST
-       init: 'init',                     // START PROCESS 
-focusObject: 'loadCluster' ,             // LOADS  Metadata about object + time series segment 
-objectAdded: 'loadSupportingObjectProc', // fabric.publishIntent( vector:object )
-  mapLoaded: 'spawnAllSupportingObjects',//  fabric.
+var procs = {};                           // ALL PROCESSES
+var eventer = new EventTarget();          // FABRIC EVENTER 
+var creds = false;                        // future cache ref 
+var input_to_request={                    // MAP-INTERACTION : FABRIC-REQUEST
+       init: 'init',                      // START PROCESS 
+focusObject: 'loadCluster' ,              // LOADS  Metadata about object + time series segment 
+objectAdded: 'loadSupportingObjectProc',  // fabric.publishIntent( vector:object )
+  mapLoaded: 'spawnAllSupportingObjects', // fabric.
 }
 
 
-// HIGH LEVEL SERVICEGRID
+// CREDENTIAL PROVIDER
 function init( initObj ){
     creds = initObj.creds; 
 }
 
+// MESSAGE TO WORKERS:
+function messageToWorker( intentObj ){
+    //FIND Worker by ID in existing workers list: 
+    mergeIntent( intentObj )
+    //If worker does not exist , spawn worker: 
+    //after worker spawned or retrieved postMessage () 
+    //(currently landled by mergeIntent)
+}
 
+// MESSAGE FROM WORKERS: 
+function messageFromWorker( e ){
+    var messageObject = e.data;
+    if( messageObject.method == 'report'){
+        procs[ messageObject.uuid ]['wid']=messageObject['wid'];
+    }
+    if( messageObject.method == 'fetchTicker'){
+    }
+    dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
+    //console.log('Fabric: ', e.data.method  , e.data );
+}
 
-// GENERAL PROC START 
+// GENERAL PROC STARTER 
 async function mergeIntent( intentObj ){
     console.log(' merge Intent ', new Date().getTime() )    
 
@@ -39,40 +58,35 @@ async function mergeIntent( intentObj ){
     // AQUIRE TARGET PER UUID OR SPAWN: 
     // ( SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
     var target_worker;
-    if( procs[ intentObj.uuid ] ){
+    if( procs[ intentObj.uuid ] ){ 
         target_worker = procs[ intentObj.uuid ].worker;
         target_worker.postMessage( intentObj );
     }else{
         const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
         // IF DRIVER EXISTS IN CCXT instead // 
         // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
-        const driver = ( intentObj.brand  in ccxt ) ? 'ccxt' : 'ethers';
+        const driver = ( intentObj.
+                        brand  in ccxt ) ? 'ccxt' : 'ethers';
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
         target_worker = new Worker( driver_path   );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy
         procs[ intentObj.uuid ] = { worker:target_worker }; 
-        target_worker.addEventListener("message", messageFromWorker );        
-        target_worker.addEventListener("onerror", messageFromWorker );      
-
+        target_worker.addEventListener('message', messageFromWorker );        
+        target_worker.addEventListener('onerror', messageFromWorker );      
 
         // UNREGISTERED WORKER MUST FIRE INIT BEFORE FINAL ( init last to overwrite )
         target_worker.postMessage( { ...px3 , method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]  } )
         // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
-        target_worker.postMessage( px3 )
+        if( px3.method ){
+            target_worker.postMessage( px3 )    
+        }
+        
         // creds could be expanded to creds.keySelect( ['dom','domain','brand'] )
     }
 }
 
-
-// EVENTS BUBBLING UP FROM WORKERS 
-function messageFromWorker( e ){
-    console.log('Fabric: ', e.data.method  , e.data );
-    var messageObject = e.data;
-    if( messageObject.method == 'report'){
-        procs[ messageObject.uuid ]['wid']=messageObject['wid'];
-    }
-    if( messageObject.method == 'fetchTicker'){
-    }
-    dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
+// ERROR FROM WORKER 
+async function errorFromWorker( e ){
+    console.log(' Fabric ERROR: ', e );
 }
 
 
@@ -85,15 +99,7 @@ function keySelect( k , v){
     console.log(' key selecting by ', k );
 }
 
-function errorFromWorker( e ){
-    console.log(' Fabric ERROR: ', e );
-}
 
-function messageToWorker( e ){
-    //  FIND Worker by ID in existing workers list: 
-    //  If worker does not exist , spawn worker: 
-    //  after worker spawned or retrieved postMessage () 
-}
 
 async function querySegment( targObj ){
     // query Graph , match graph with grid of avail 
@@ -117,6 +123,7 @@ function dropProcs(){
         console.log( 'terminated: ',p)
     }
 }
+
 export default {
     init,
     objectsOnline,
@@ -128,6 +135,13 @@ export default {
     dispatchEvent:eventer.dispatchEvent.bind(this)
 }
 
+
+
+// TIMECOORDS 
+// TIMESERIES PER COORDINATE 
+function accessFrameByVector( x , y , z, s, t){
+    
+}
 
 
 // FUTURE ENABLE ERROR TRACK 
