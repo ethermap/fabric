@@ -1,46 +1,55 @@
 
+// import  * as coingecko from 
+
 // OLD SCHOOL IMPORTS 
+importScripts('./coingecko.js')
+importScripts('./messagecache.js')
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
 //   ADDRESS:  Contract can map across other networks points to Address
 //   BRAND:    Can apply to Tokens, Dexes, Networks 
 //   DRIVER:   Default Ethers but what about others ? 
+//.  NETWORK: 
 //   SYMBOL:   Each Wallet can have multiples ?
 //   Address of contract VS. Address of wallet / priv_key 
 
 
+// NEED ABI SEARCH service 
+// need pricefeeds Oracles markets 
+// need wallet heat to operate 
+
 var methods = {
-    'init':init ,
-    'base':init,
-    'close':init,
-    'spawn':init
+    init: init,
+    base: init,
+    close: init,
+    spawn: init,
+    balance
 }
-var wid = 'w'+ Math.round( Math.random()*9999 );
+var wid = 'w' + Math.round(Math.random() * 9999);
 var access_count = 0;
 var initObj;
 var provider = new ethers.providers.AlchemyProvider();
+var wallet = false
 
 // ALL INCOMING MESSAGES ROUTED
 onmessage = incomingRequest;
-function incomingRequest( e ){
-    var xclass = ( 'method' in e.data ) ? e.data.method : ( 'fn' in e.data )? e.data.fn : 'init';
+function incomingRequest(e) {
+    var xclass = ('method' in e.data) ? e.data.method : ('fn' in e.data) ? e.data.fn : 'init';
     try {
-        methods[ xclass ]( e.data );
-    }catch( err ){
+        methods[xclass](e.data);
+    } catch (err) {
         console.log(' err in ethers vehicle: ', err)
     }
-  
 }
 
 
 
-async function init( obj ){
-    
+async function init(obj) {
+
     // console.log( ' init in Worker: ', wid , this , self );
-    
-    // THIS  DRIVES PROC LIST in QNAV ( COULD BE SUPERCLASS IN FUTURE )
-    postMessage( { met:'report' ,  wid:wid ,  driver:'ethers',  domain:'ethers' } );
- 
+    // THIS DRIVES PROC LIST in QNAV ( COULD BE SUPERCLASS IN FUTURE )
+    postMessage({ met: 'report', wid: wid, driver: 'ethers', domain: 'ethers' });
+
     // var the_abi = await fetchAbi( cons[obj['carrier']] );
     // var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
     // var dec = await usdt.connect( provider ).decimals()
@@ -57,83 +66,115 @@ async function init( obj ){
     //     var whalbal = await cont.connect( provider ).balanceOf( uni_whale_address )
     //     var blocknum = await  provider.getBlockNumber();
     //     postMessage( { met:'block' ,  block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
-    // }
-  
-    provider =  new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
-    var walletPrivateKey = new ethers.Wallet( obj.se ); // D6D5
-    wallet = walletPrivateKey.connect(provider)  
-    var blocknum = await  provider.getBlockNumber();  
-    var bal = await wallet.getBalance();
-    var balf = ethers.utils.formatEther(bal);
-
-
-  
-    // BALANCE OF TOKEN AND NATIVE 
-    // ERC20 and AVAX on TESTNET  or ENS: 
-    var daiAddress = "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70";
-    var daiAddressTest = '0x34B6C87bb59Eb37EFe35C8d594a234Cd8C654D50';
-
-    daiAddress = daiAddressTest;
- 
-    const daiAbi = [
-      "function name() view returns (string)",
-      "function symbol() view returns (string)",
-      "function balanceOf(address) view returns (uint)",
-      "function transfer(address to, uint amount)",
-      "event Transfer(address indexed from, address indexed to, uint amount)"
-    ];
-
+    // } 
     
-
-
-    const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
-
-      
-    var sm = await daiContract.symbol()
-    balance = await daiContract.balanceOf( wallet.address )
-    ethers.utils.formatUnits(balance, 18)
-    var l = 4;
+    ///////.
+    //////.
+    /////.  
+    ////.   CONCENTRATE SIGNALS ACQUIRED ACROSS WORKERS !! 
+    ///.
+    //.
+    
+    // CAN READ VALUES BE BUBBLED UP DESPITE SEPARATE SOURCES , TO CENTRAL SHARED GRID 
+    // bubbleSignals( { brand:x , attrib1:y , attrib2:z } )
+    initObj = obj;
+    
+    //// WALLET CONNECTOR FOR CLIENT 
+    provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
+    var walletPrivateKey = new ethers.Wallet(obj.se); // D6D5
+    wallet = walletPrivateKey.connect(provider)
 }
 
 
-const returnMethods = ( obj = {} )=>{
-   const members = Object.getOwnPropertyNames(obj);
-   const methods = members.filter(el => {
-      return typeof obj[el] === 'function';
-   })
-   return methods;
+async function balance(obj) {
+
+    var outboundObj = {
+        uuid:obj.uuid,
+        method:obj.method,
+        symbol:obj.symbol
+    }
+    
+    ///// GET PRICES
+    var maintokens = await cg.markets();
+    
+    var bal = await wallet.getBalance();
+    var balf = ethers.utils.formatEther(bal);
+
+    maintokens[ obj.symbol.toLowerCase() ].balance = balf; 
+    outboundObj.payload = maintokens; 
+    messageCache.post( outboundObj );
+    
+}
+
+async function zeroKool(){
+
+    var blocknum = await provider.getBlockNumber();    
+
+    // BALANCE OF TOKEN AND NATIVE 
+    // ERC20 / AVAX on TESTNET/ENS 
+    var daiAddress = "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70";
+    var daiAddressTest = '0x34B6C87bb59Eb37EFe35C8d594a234Cd8C654D50';
+    daiAddress = daiAddressTest;
+    const daiAbi = [
+        "function name() view returns (string)",
+        "function symbol() view returns (string)",
+        "function transfer(address to, uint amount)",
+        "function balanceOf(address) view returns (uint)",
+        "event Transfer(address indexed from, address indexed to, uint amount)"
+    ];
+    const daiContract = new ethers.Contract( daiAddress, daiAbi, provider );
+
+    var sm = await daiContract.symbol()
+    balance = await daiContract.balanceOf(wallet.address)
+    var balz = ethers.utils.formatUnits(balance, 18)
+
+    
+}
+
+async function pricedBalances( obj ){
+    // FIND PRICE GECKO 
+    // GET BALANCE 
+    // calculate value of units 
+    // build outbound object  
+}
+
+const returnMethods = (obj = {}) => {
+    const members = Object.getOwnPropertyNames(obj);
+    const methods = members.filter(el => {
+        return typeof obj[el] === 'function';
+    })
+    return methods;
 };
 
 
 // LOAD ABI FROM REMOTE 
-async function fetchAbi( addr_in ){
+async function fetchAbi(addr_in) {
     // MAKE THIS MORE ROBUST WITH FALLBACKS TO LOCAL // 
-    // OTHER SOURCES FOR OTHER NETWORKS 
-    // INTERNAL MAP 
-    var address_of_contract = addr_in; 
-    var prom = new Promise( async ( resolve, reject ) => {
+    // OTHER SOURCES FOR OTHER NETWORKS - INTERNAL MAP 
+    var address_of_contract = addr_in;
+    var prom = new Promise(async (resolve, reject) => {
         var esk = '6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
         var url = 'https://api.etherscan.io/api?module=contract&action=getabi&address="+address_of_contract+"&apikey=6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
         var options = { json: true };
-        const response = await fetch( url );
+        const response = await fetch(url);
         const ab = await response.json();
-        resolve( ab.result )
+        resolve(ab.result)
     });
     return prom;
 }
 
 // CALL FUNCTION SANS ABI
-function call_sig( method_name , types_arr , vals_arr  ){
-  var types_array = types_arr;
-  var types_array_string = types_array.join(',');
-  var funcSig = method_name + '('+types_array_string+')';
-  let funcBytes = ethers.utils.toUtf8Bytes( funcSig );
-  var funcKeccak = ethers.utils.keccak256( funcBytes );
-  var funcSegment = funcKeccak.slice(0,10);
-  let bbPack = ethers.utils.solidityPack(
-      [ 'bytes4', ...types_arr ], 
-      [ funcSegment, ...vals_arr ] );
-  return bbPack;
+function call_sig(method_name, types_arr, vals_arr) {
+    var types_array = types_arr;
+    var types_array_string = types_array.join(',');
+    var funcSig = method_name + '(' + types_array_string + ')';
+    let funcBytes = ethers.utils.toUtf8Bytes(funcSig);
+    var funcKeccak = ethers.utils.keccak256(funcBytes);
+    var funcSegment = funcKeccak.slice(0, 10);
+    let bbPack = ethers.utils.solidityPack(
+        ['bytes4', ...types_arr],
+        [funcSegment, ...vals_arr]);
+    return bbPack;
 }
 
 //import { ethers } from "ethers";
@@ -143,39 +184,39 @@ function call_sig( method_name , types_arr , vals_arr  ){
 
 const poolAddress = "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8";
 const poolImmutablesAbi = [
-  "function factory() external view returns (address)",
-  "function token0() external view returns (address)",
-  "function token1() external view returns (address)",
-  "function fee() external view returns (uint24)",
-  "function tickSpacing() external view returns (int24)",
-  "function maxLiquidityPerTick() external view returns (uint128)",
+    "function factory() external view returns (address)",
+    "function token0() external view returns (address)",
+    "function token1() external view returns (address)",
+    "function fee() external view returns (uint24)",
+    "function tickSpacing() external view returns (int24)",
+    "function maxLiquidityPerTick() external view returns (uint128)",
 ];
 const poolContract = new ethers.Contract(
-  poolAddress,
-  poolImmutablesAbi,
-  provider
+    poolAddress,
+    poolImmutablesAbi,
+    provider
 );
 
 async function getPoolImmutables() {
-  const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] =
-    await Promise.all([
-      poolContract.factory(),
-      poolContract.token0(),
-      poolContract.token1(),
-      poolContract.fee(),
-      poolContract.tickSpacing(),
-      poolContract.maxLiquidityPerTick(),
-    ]);
+    const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] =
+        await Promise.all([
+            poolContract.factory(),
+            poolContract.token0(),
+            poolContract.token1(),
+            poolContract.fee(),
+            poolContract.tickSpacing(),
+            poolContract.maxLiquidityPerTick(),
+        ]);
 
-  const immutables = {
-    factory,
-    token0,
-    token1,
-    fee,
-    tickSpacing,
-    maxLiquidityPerTick,
-  };
-  return immutables;
+    const immutables = {
+        factory,
+        token0,
+        token1,
+        fee,
+        tickSpacing,
+        maxLiquidityPerTick,
+    };
+    return immutables;
 }
 
 
@@ -193,34 +234,34 @@ if( pingcount > 3 ){
 
 
 urllib.request( url , function (err, data, res) {
-    if (err) { throw err; }  // error 
+    if (err) { throw err; }  // error
     //console.log(res.statusCode);
     //console.log(res.headers);
     //console.log(data.toString()); // data is Buffer instance
     //console.log('abi loaf status:', response && response.statusCode); // Print the response status code if a response was received
     //console.log('body:', body);
     var abi_obj = JSON.parse( data );
-    resolve( JSON.parse( abi_obj.result ) ); //  
-}) 
+    resolve( JSON.parse( abi_obj.result ) ); //
+})
 
 var tick ={ returned:'dat'}
 var messageStruct = {
     fn:'fetchTicker',
-    obj:tick , 
+    obj:tick ,
     domain:this.domain
 }
 
-    // The Contract object
-    // Read-Only Methods
-    // Querying the DAI Contract
-    // Get the ERC-20 token name
-    // var nm = await daiContract.name()
-    // Dai Stablecoin
-    // Get the ERC-20 token symbol (for tickers and UIs)
-    // DAI
-    // Get the balance of an address
-    // BigNumber: "8501797437309328201631" 
-    // Format the DAI for displaying to the user  
+// The Contract object
+// Read-Only Methods
+// Querying the DAI Contract
+// Get the ERC-20 token name
+// var nm = await daiContract.name()
+// Dai Stablecoin
+// Get the ERC-20 token symbol (for tickers and UIs)
+// DAI
+// Get the balance of an address
+// BigNumber: "8501797437309328201631"
+// Format the DAI for displaying to the user
 */
 
 // interface Immutables {
