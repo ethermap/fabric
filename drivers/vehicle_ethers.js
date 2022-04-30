@@ -3,14 +3,18 @@
 
 // OLD SCHOOL IMPORTS 
 importScripts('./coingecko.js')
+importScripts('./curve.js')
 importScripts('./messagecache.js')
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
 //   ADDRESS:  Contract can map across other networks points to Address
 //   BRAND:    Can apply to Tokens, Dexes, Networks 
 //   DRIVER:   Default Ethers but what about others ? 
-//.  NETWORK: 
+//.  NETWORK:   ( ETH mainnet  ,  ETH.robsten , AVAX.main. , AVAX. )
 //   SYMBOL:   Each Wallet can have multiples ?
+//   ABI: METHOD_LIST  ( can be loaded from contract URL or identifier  from fabric )
+//                          mainnet.eth 
+//   
 //   Address of contract VS. Address of wallet / priv_key 
 
 
@@ -74,12 +78,21 @@ async function init(obj) {
     ////.   CONCENTRATE SIGNALS ACQUIRED ACROSS WORKERS !! 
     ///.
     //.
+    var mmm = await cv.markets()
     
     // CAN READ VALUES BE BUBBLED UP DESPITE SEPARATE SOURCES , TO CENTRAL SHARED GRID 
     // bubbleSignals( { brand:x , attrib1:y , attrib2:z } )
     initObj = obj;
+
+    var d_router = {
+        avax:'https://api.avax-test.network/ext/bc/C/rpc',
+        avax_test:'https://api.avax-test.network/ext/bc/C/rpc',
+        ethereum:'https://alchemy.node.something',
+        ethereum_ropsten:'https://alchemy.node.something',
+        polygon:''
+    }
     
-    //// WALLET CONNECTOR FOR CLIENT 
+    //// WALLET CONNECTOR FOR CLIENT  // obj.brand avax.  // networks[ brand ] => 
     provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
     var walletPrivateKey = new ethers.Wallet(obj.se); // D6D5
     wallet = walletPrivateKey.connect(provider)
