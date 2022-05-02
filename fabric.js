@@ -117,7 +117,6 @@ function getProcs(){
 }
 function dropProcs(){
     for( var p in procs ){
-
         var pr = procs[p];
         pr.terminate();
         console.log( 'terminated: ',p)

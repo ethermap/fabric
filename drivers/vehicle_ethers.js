@@ -4,6 +4,7 @@
 // OLD SCHOOL IMPORTS 
 importScripts('./coingecko.js')
 importScripts('./curve.js')
+importScripts('./ddxt.js')
 importScripts('./messagecache.js')
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
@@ -78,6 +79,10 @@ async function init(obj) {
     ////.   CONCENTRATE SIGNALS ACQUIRED ACROSS WORKERS !! 
     ///.
     //.
+
+    var cobj = {}
+    driver = new ddxt[ obj.brand ]({ ...{} , ...cobj , proxy:'http://localhost:8080/'} );
+    
     var mmm = await cv.markets()
     
     // CAN READ VALUES BE BUBBLED UP DESPITE SEPARATE SOURCES , TO CENTRAL SHARED GRID 
