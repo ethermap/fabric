@@ -11,6 +11,7 @@ _/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____
 // LOCALS IN MOD SCOPE
 var procs = {};                           // ALL PROCESSES
 var eventer = new EventTarget();          // FABRIC EVENTER 
+var channel = new MessageChannel();       // FOR WORKER PORTS 
 var creds = false;                        // future cache ref 
 var input_to_request={                    // MAP-INTERACTION : FABRIC-REQUEST
        init: 'init',                      // START PROCESS 
@@ -68,7 +69,7 @@ async function mergeIntent( intentObj ){
         const driver = ( intentObj.
                         brand  in ccxt ) ? 'ccxt' : 'ethers';
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
-        target_worker = new Worker( driver_path   );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy
+        target_worker = new Worker( driver_path , { type:'classic'} );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         procs[ intentObj.uuid ] = { worker:target_worker }; 
         target_worker.addEventListener('message', messageFromWorker );        
         target_worker.addEventListener('onerror', messageFromWorker );      

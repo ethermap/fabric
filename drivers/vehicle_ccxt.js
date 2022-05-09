@@ -2,7 +2,8 @@
 
 // OLD SCHOOL UNTIL ES6 SUPPORT IN R_WEBVIEW
 importScripts('/v_modules/ccxt.browser.js');       
-importScripts('/x_modules/fabric/misc.js');      
+importScripts('./misc.js');     
+importScripts('./outcache.js');     
 
 
 // LOCAL VARS 
@@ -75,7 +76,7 @@ async function init( obj ){
 
 async function defaultMethod( obj ){
 
-    console.log(' default Method called on vehicle CCXT with: ', obj )
+    console.log('default Method called on vehicle CCXT with: ', obj )
 }
 
 async function loadMarkets( obj ){
@@ -110,35 +111,6 @@ async function currencies( obj ){
         postMessage( outObj ); 
         //sendOutboundPayload( )
     });
-}
-
-function getCachedMethod( method ){
-
-    if( method in cache ){
-        return cache[ method ]
-    }else{
-        return false 
-    }
-}
-
-
-// INSTANT POST OF CACHED DATA FOR FAST UI DURING LOADING 
-function cacheBusPost( obj ){
-
-    
-    if( obj.payload ){ // IF MESSAGE HAS PAYLOAD UPDATE CACHE AND SEND 
-        
-        cache[ obj.method ] = obj.payload;
-        postMessage( obj );
-        
-    }else if( obj.method in cache ){ // IF NO PAYLOAD BUT CACHED SEND CACHE 
-        
-        obj.payload = cache[ obj.method ]
-        postMessage( obj )
-        
-    }else{ // DO NOTHING 
-        return false 
-    }
 }
 
 
