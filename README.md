@@ -41,7 +41,8 @@ Fabric is designed to enable parallel network operations and aggregate the respo
 - Hierarchical Services Cache 
 
 ### Appendix
-Basic input appendix
+OCAP: [Ports as the basis of an object-capability model on the web](https://html.spec.whatwg.org/multipage/web-messaging.html#ports-as-the-basis-of-an-object-capability-model-on-the-web)
+
 
 
 ## Fabric 
