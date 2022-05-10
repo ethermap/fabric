@@ -1,5 +1,5 @@
 ## Transact Fabric
-Automatic isolated process manager for [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API). Features [Structured Clone](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) message bus, standard [Event Target](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) interface, scope isolation [LavaMoat](https://github.com/LavaMoat/LavaMoat) and [Global Scope](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope), and configurable config provider. 
+Automatic isolated process manager for [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API). Features [Structured Clone](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) message bus using [Message Channel](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel) , standard [Event Target](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) interface, scope isolation [LavaMoat](https://github.com/LavaMoat/LavaMoat) and [Global Scope](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope), and configurable config provider. 
 
 
 Install
@@ -41,7 +41,8 @@ Fabric is designed to enable parallel network operations and aggregate the respo
 - Hierarchical Services Cache 
 
 ### Appendix
-Basic input appendix
+OCAP: [Ports as the basis of an object-capability model on the web](https://html.spec.whatwg.org/multipage/web-messaging.html#ports-as-the-basis-of-an-object-capability-model-on-the-web)
+
 
 
 ## Fabric 
