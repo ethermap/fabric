@@ -1,25 +1,27 @@
 
-import * as ccx  from '/v_modules/ccxt.browser.js'
-                                                                                        /*
-  _____      ___.         .__                 _____                                     
-_/ ____\____ \_ |_________|__| ____     _____/ ____\   _________________    ____  ____  
-\   __\\__  \ | __ \_  __ \  |/ ___\   /  _ \   __\   /  ___/\____ \__  \ _/ ___\/ __ \ 
- |  |   / __ \| \_\ \  | \/  \  \___  (  <_> )  |     \___ \ |  |_> > __ \\  \__\  ___/ 
- |__|  (____  /___  /__|  |__|\___  >  \____/|__|    /____  >|   __(____  /\___  >___  >
-            \/    \/              \/                      \/ |__|       \/     \/    \/ */
 
+import * as ccx  from '/v_modules/ccxt.browser.js'
+
+/*_____      ___           __                 _____                                     
+_/ ____\____ \_ |_________|__| ____     _____/  ___\  __________________  _____   ____  
+\   __\\__  \ | __ \_  __ \  |/ ___\   /  _ \   __\  /  ___/|  __ \__   \/  ___\ / __ \ 
+ |  |   / __ \| \_\ \  | \/  \  \___  (  (_) )  |    \___  \|  |_) )/ __ \  \___\  ___/_
+ |__|  (______)_____/__|  |__|\____/   \____/|__|   /______/|   __/(____ /\_____/\_____/
+                                                            |__|                     */
 // LOCALS IN MOD SCOPE
 var procs = {};                           // ALL PROCESSES
 var eventer = new EventTarget();          // FABRIC EVENTER 
 var channel = new MessageChannel();       // FOR WORKER PORTS 
+var port1 = channel.port1;                // PORT
+var port2 = channel.port2;                // PORT
 var creds = false;                        // future cache ref 
-var input_to_request={                    // MAP-INTERACTION : FABRIC-REQUEST
-       init: 'init',                      // START PROCESS 
-focusObject: 'loadCluster' ,              // LOADS  Metadata about object + time series segment 
-objectAdded: 'loadSupportingObjectProc',  // fabric.publishIntent( vector:object )
-  mapLoaded: 'spawnAllSupportingObjects', // fabric.
-}
 
+// STANDARD CAPABILITY 
+var input_to_capability={                 // MAP-INTERACTION : FABRIC-REQUEST
+        init: 'init',                     // START PROCESS 
+ focusObject: 'loadCluster' ,             // LOADS  Metadata about object + time series segment 
+ objectAdded: 'loadSupportingObjectProc'  // fabric.publishIntent( vector:object )
+}
 
 // CREDENTIAL PROVIDER
 function init( initObj ){
@@ -66,8 +68,7 @@ async function mergeIntent( intentObj ){
         const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
         // IF DRIVER EXISTS IN CCXT instead // 
         // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
-        const driver = ( intentObj.
-                        brand  in ccxt ) ? 'ccxt' : 'ethers';
+        const driver = ( intentObj.brand in ccxt ) ? 'ccxt' : 'ethers';
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
         target_worker = new Worker( driver_path , { type:'classic'} );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         procs[ intentObj.uuid ] = { worker:target_worker }; 
@@ -80,7 +81,6 @@ async function mergeIntent( intentObj ){
         if( px3.method ){
             target_worker.postMessage( px3 )    
         }
-        
         // creds could be expanded to creds.keySelect( ['dom','domain','brand'] )
     }
 }
