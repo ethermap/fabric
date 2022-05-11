@@ -1,12 +1,13 @@
 
 
 import * as ccx  from '/v_modules/ccxt.browser.js'
+import * as utils from './drivers/utils.js'
 
 /*_____      ___           __                 _____                                     
-_/ ____\____ \_ |_________|__| ____     _____/  ___\  __________________  _____   ____  
-\   __\\__  \ | __ \_  __ \  |/ ___\   /  _ \   __\  /  ___/|  __ \__   \/  ___\ / __ \ 
- |  |   / __ \| \_\ \  | \/  \  \___  (  (_) )  |    \___  \|  |_) )/ __ \  \___\  ___/_
- |__|  (______)_____/__|  |__|\____/   \____/|__|   /______/|   __/(____ /\_____/\_____/
+_/ ____\____ \_ |_________|__| ____     _____/  ___\  ___________________  _____   ____  
+\   __\\__  \ | __ \_  __ \  |/ ___\   /  _ \   __\  /  ___/|  __  \___  \/  ___\ / __ \ 
+ |  |   / __ \| \_\ \  | \/  \  \___  (  (_) )  |    \___  \|  |_)  )/ _  \  \___/  ___/
+ |__|  (______)_____/__|  |__|\____/   \____/|__|   /______/|   ___/(_____/\____/\_____/
                                                             |__|                     */
 // LOCALS IN MOD SCOPE
 var procs = {};                           // ALL PROCESSES
@@ -79,6 +80,7 @@ async function mergeIntent( intentObj ){
         target_worker.postMessage( { ...px3 , method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]  } )
         // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
+            await utils.sleep(1000);
             target_worker.postMessage( px3 )    
         }
         // creds could be expanded to creds.keySelect( ['dom','domain','brand'] )

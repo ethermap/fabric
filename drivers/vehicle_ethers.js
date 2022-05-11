@@ -5,6 +5,7 @@
 importScripts('./coingecko.js')
 importScripts('./curve.js')
 importScripts('./ddxt.js')
+importScripts('./abifinder.js')
 importScripts('./messagecache.js')
 importScripts('/v_modules/ethers-5.1.umd.min.js');
 
@@ -22,6 +23,18 @@ importScripts('/v_modules/ethers-5.1.umd.min.js');
 // NEED ABI SEARCH service 
 // need pricefeeds Oracles markets 
 // need wallet heat to operate 
+    
+// CAN READ VALUES BE BUBBLED UP DESPITE SEPARATE SOURCES , TO CENTRAL SHARED GRID 
+// bubbleSignals( { brand:x , attrib1:y , attrib2:z } )
+
+
+var d_router = {
+    avax:'https://api.avax-test.network/ext/bc/C/rpc',
+    avax_test:'https://api.avax-test.network/ext/bc/C/rpc',
+    ethereum:'https://alchemy.node.something',
+    ethereum_ropsten:'https://alchemy.node.something',
+    polygon:''
+}
 
 var methods = {
     init: init,
@@ -51,28 +64,11 @@ function incomingRequest(e) {
 
 async function init(obj) {
 
-    // console.log( ' init in Worker: ', wid , this , self );
     // THIS DRIVES PROC LIST in QNAV ( COULD BE SUPERCLASS IN FUTURE )
     postMessage({ met: 'report', wid: wid, driver: 'ethers', domain: 'ethers' });
 
-    // var the_abi = await fetchAbi( cons[obj['carrier']] );
-    // var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
-    // var dec = await usdt.connect( provider ).decimals()
-    // provider = new ethers.providers.AlchemyProvider();
-    // provider =  new ethers.providers.JsonRpcProvider('https://poly/gon/rpc'); 
-    // provider =  new ethers.providers.JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc');  
-    // console.log(returnMethods(cont));
-    // var pm= await getPoolImmutables();
-    // CALLBACK REPEAT 
-    // var intervalID = setInterval( myCallback, 3500, 'Parameter 1', 'Parameter 2');
-    // async function myCallback(a, b)
-    // {
-    //     console.log(' worker: ', wid, self.hostname )
-    //     var whalbal = await cont.connect( provider ).balanceOf( uni_whale_address )
-    //     var blocknum = await  provider.getBlockNumber();
-    //     postMessage( { met:'block' ,  block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
-    // } 
-    
+    // STORE TELEMETS 
+    initObj = obj;
     ///////.
     //////.
     /////.  
@@ -80,22 +76,9 @@ async function init(obj) {
     ///.
     //.
 
+    // METADATA CONNECTOR IN CASE OF WALLET SYSTEMS 
     var cobj = {}
     driver = new ddxt[ obj.brand ]({ ...{} , ...cobj , proxy:'http://localhost:8080/'} );
-    
-    var mmm = await cv.markets()
-    
-    // CAN READ VALUES BE BUBBLED UP DESPITE SEPARATE SOURCES , TO CENTRAL SHARED GRID 
-    // bubbleSignals( { brand:x , attrib1:y , attrib2:z } )
-    initObj = obj;
-
-    var d_router = {
-        avax:'https://api.avax-test.network/ext/bc/C/rpc',
-        avax_test:'https://api.avax-test.network/ext/bc/C/rpc',
-        ethereum:'https://alchemy.node.something',
-        ethereum_ropsten:'https://alchemy.node.something',
-        polygon:''
-    }
     
     //// WALLET CONNECTOR FOR CLIENT  // obj.brand avax.  // networks[ brand ] => 
     provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
@@ -103,6 +86,12 @@ async function init(obj) {
     wallet = walletPrivateKey.connect(provider)
 }
 
+
+async function markets( obj ){
+
+    var mmm = await cv.markets()
+    messageCache.post( outboundObj );
+}
 
 async function balance(obj) {
 
@@ -165,21 +154,6 @@ const returnMethods = (obj = {}) => {
 };
 
 
-// LOAD ABI FROM REMOTE 
-async function fetchAbi(addr_in) {
-    // MAKE THIS MORE ROBUST WITH FALLBACKS TO LOCAL // 
-    // OTHER SOURCES FOR OTHER NETWORKS - INTERNAL MAP 
-    var address_of_contract = addr_in;
-    var prom = new Promise(async (resolve, reject) => {
-        var esk = '6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
-        var url = 'https://api.etherscan.io/api?module=contract&action=getabi&address="+address_of_contract+"&apikey=6PGTMFT1C1WA8FP4Q9TQ5A2W17H5U4FIN2';
-        var options = { json: true };
-        const response = await fetch(url);
-        const ab = await response.json();
-        resolve(ab.result)
-    });
-    return prom;
-}
 
 // CALL FUNCTION SANS ABI
 function call_sig(method_name, types_arr, vals_arr) {
@@ -290,3 +264,22 @@ var messageStruct = {
 //   tickSpacing: number;
 //   maxLiquidityPerTick: number;
 // }
+
+
+    // var the_abi = await fetchAbi( cons[obj['carrier']] );
+    // var cont = new ethers.Contract( cons[obj['carrier']] , the_abi  );
+    // var dec = await usdt.connect( provider ).decimals()
+    // provider = new ethers.providers.AlchemyProvider();
+    // provider =  new ethers.providers.JsonRpcProvider('https://poly/gon/rpc'); 
+    // provider =  new ethers.providers.JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc');  
+    // console.log(returnMethods(cont));
+    // var pm= await getPoolImmutables();
+    // CALLBACK REPEAT 
+    // var intervalID = setInterval( myCallback, 3500, 'Parameter 1', 'Parameter 2');
+    // async function myCallback(a, b)
+    // {
+    //     console.log(' worker: ', wid, self.hostname )
+    //     var whalbal = await cont.connect( provider ).balanceOf( uni_whale_address )
+    //     var blocknum = await  provider.getBlockNumber();
+    //     postMessage( { met:'block' ,  block:blocknum  , last:whalbal , domain:'ethereum' , symbol:'ETH/USD'} );
+    // } 
