@@ -8,6 +8,7 @@ importScripts('./ddxt.js')
 importScripts('./abifinder.js')
 importScripts('./messagecache.js')
 importScripts('/v_modules/ethers-5.1.umd.min.js');
+// import { ethers } from '/v_modules/ethers-5.6.umd.min.js';
 
 //   ADDRESS:  Contract can map across other networks points to Address
 //   BRAND:    Can apply to Tokens, Dexes, Networks 

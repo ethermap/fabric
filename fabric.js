@@ -69,18 +69,25 @@ async function mergeIntent( intentObj ){
         const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
         // IF DRIVER EXISTS IN CCXT instead // 
         // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
-        const driver = ( intentObj.brand in ccxt ) ? 'ccxt' : 'ethers';
-        const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver+'.js';
-        target_worker = new Worker( driver_path , { type:'classic'} );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
-        procs[ intentObj.uuid ] = { worker:target_worker }; 
+        const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : 'ethers_esm'+'.mjs';
+        const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver;
+        
+        // CHECK IF WORKER.CLASSIC or WORKER.MODULE
+        const driver_conf = driver.includes('esm') ?  { type:'module'} : { type:'classic' }
+        target_worker = new Worker( driver_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         target_worker.addEventListener('message', messageFromWorker );        
         target_worker.addEventListener('onerror', messageFromWorker );      
 
+        // INSERT PROCESS 
+        procs[ intentObj.uuid ] = { worker:target_worker }; 
+
+        // TODO: CHECK IF CREDENTIALS IN px3 
+        // IN ABSENCE OF KEYSTORE and USE MANUALLY ADDED 
         // UNREGISTERED WORKER MUST FIRE INIT BEFORE FINAL ( init last to overwrite )
         target_worker.postMessage( { ...px3 , method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]  } )
         // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
-            await utils.sleep(1000);
+            await utils.sleep(100);
             target_worker.postMessage( px3 )    
         }
         // creds could be expanded to creds.keySelect( ['dom','domain','brand'] )
