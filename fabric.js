@@ -4,10 +4,10 @@ import * as ccx  from '/v_modules/ccxt.browser.js'
 import * as utils from './drivers/utils.js'
 
 /*_____      ___           __                 _____                                     
-_/ ____\____ \_ |_________|__| ____     _____/  ___\  ___________________  _____   ____  
-\   __\\__  \ | __ \_  __ \  |/ ___\   /  _ \   __\  /  ___/|  __  \___  \/  ___\ / __ \ 
- |  |   / __ \| \_\ \  | \/  \  \___  (  (_) )  |    \___  \|  |_)  )/ _  \  \___/  ___/
- |__|  (______)_____/__|  |__|\____/   \____/|__|   /______/|   ___/(_____/\____/\_____/
+_/ ____\____ \_ |__ ______|__| ____     _____/  ___\  _____________ _____  _____  _____  
+\   __\\__  \ | __ \|  __ \  |/ ___\   /  _ \   __\  /  ___/|  __  \\__  \/  ___\/  __ \ 
+ |  |   / __ \| \_\ \  | \/  |  \___  (  (_) )  |    \___  \|  |_)  )/ _  \  \___\  ___/_
+ |__|  (______)_____/__|  |__|\____/   \____/|__|   /______/|   ___/(_____/\_____/\_____/
                                                             |__|                     */
 // LOCALS IN MOD SCOPE
 var procs = {};                           // ALL PROCESSES
@@ -41,13 +41,20 @@ function messageToWorker( intentObj ){
 // MESSAGE FROM WORKERS: 
 function messageFromWorker( e ){
     var messageObject = e.data;
+    // USE SELF REPORT EVENTS TO ADD WORKER METADATA 
     if( messageObject.method == 'report'){
         procs[ messageObject.uuid ]['wid']=messageObject['wid'];
     }
-    if( messageObject.method == 'fetchTicker'){
-    }
+    // PROPAGATE MESSAGES AS EVENTS 
     dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
     //console.log('Fabric: ', e.data.method  , e.data );
+}
+
+// MESSAGE ERROR FROM WORKER 
+async function errorFromWorker( e ){
+    // ROUTE TO MAIN CONE IF REF EXISTS
+    console.log(' Fabric ERROR: ', e );
+    // TODO: Add ref from options 
 }
 
 // GENERAL PROC STARTER 
@@ -94,10 +101,17 @@ async function mergeIntent( intentObj ){
     }
 }
 
-// ERROR FROM WORKER 
-async function errorFromWorker( e ){
-    console.log(' Fabric ERROR: ', e );
+// DEALLOCATES ALL WORKERS
+function dropProcs(){
+    for( var p in procs ){
+        var pr = procs[p];
+        pr.worker.terminate();
+        console.log( 'terminated: ',p)
+    }
+    // SPEED UP GARBCOL
+    procs = {};
 }
+
 
 
 // SHOULD ENABLE WORKER TARGETTING BY ATTRIOBUTE
@@ -108,6 +122,13 @@ function keySelect( k , v){
     // returned array iterate postMessage to all !! 
     console.log(' key selecting by ', k );
 }
+
+// TIMESERIES PER GRID COORDINATE 
+function accessFrameByVector( x , y , z, s, t){
+    // ACCESS CACHE AND RETURN SERIES 
+    console.log(' frame fector ')
+}
+
 
 
 
@@ -125,13 +146,6 @@ function objectsOnline(){
 function getProcs(){
     return procs;
 }
-function dropProcs(){
-    for( var p in procs ){
-        var pr = procs[p];
-        pr.terminate();
-        console.log( 'terminated: ',p)
-    }
-}
 
 export default {
     init,
@@ -146,11 +160,6 @@ export default {
 
 
 
-// TIMECOORDS 
-// TIMESERIES PER COORDINATE 
-function accessFrameByVector( x , y , z, s, t){
-    
-}
 
 
 // FUTURE ENABLE ERROR TRACK 

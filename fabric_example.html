@@ -48,19 +48,17 @@
 						method:'balance', 
 						uuid:'0x1c2c2cdd22', 
 						symbol:'AVAX'     } );
-
-				await fabric.mergeIntent( 
-				{ 
-					brand:'coinbasepro'  , 
-					method:'pricedBalances', 
-					uuid:'0x1c2c2c22' 
-				} );				
-
-
-				//await delay(12000);
-				//await fabric.mergeIntent( {                     uuid:'0x1c2c2c22' , method:'loadMarkets'     } );
-				//await fabric.mergeIntent( {                     uuid:'0x1c2c2c22' , method:'balances'     } );
-				//await fabric.mergeIntent(  { method:'fetchBalance'     , uuid:'0x1c2c2c22' , symbol:'ETH/USD'   } );
+ 
+				// await fabric.mergeIntent( 
+				// { 
+				// brand:'coinbasepro'  , 
+				// method:'pricedBalances', 
+				// uuid:'0x1c2c2c22' 
+				// } );				
+				// await delay(12000);
+				// await fabric.mergeIntent( {                     uuid:'0x1c2c2c22' , method:'loadMarkets'     } );
+				// await fabric.mergeIntent( {                     uuid:'0x1c2c2c22' , method:'balances'     } );
+				// await fabric.mergeIntent( { method:'fetchBalance'     , uuid:'0x1c2c2c22' , symbol:'ETH/USD'   } );
 
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
 			        
