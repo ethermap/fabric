@@ -3,12 +3,12 @@
 import * as ccx  from '/v_modules/ccxt.browser.js'
 import * as utils from './drivers/utils.js'
 
-/*_____      ___           __                 _____                                     
-_/ ____\____ \_ |__ ______|__| ____     _____/  ___\  _____________ _____  _____  _____  
-\   __\\__  \ | __ \|  __ \  |/ ___\   /  _ \   __\  /  ___/|  __  \\__  \/  ___\/  __ \ 
- |  |   / __ \| \_\ \  | \/  |  \___  (  (_) )  |    \___  \|  |_)  )/ _  \  \___\  ___/_
- |__|  (______)_____/__|  |__|\____/   \____/|__|   /______/|   ___/(_____/\_____/\_____/
-                                                            |__|                     */
+/*_____      ___            __                 _____                                     
+_/  ___\____ \_ |___ ______|__| ____     _____/  ___\  _____________ ______  _____  _____  
+\   __\\__  \ | __  \\  __ \  |/ ___\   /  _ \   __\  /  ___/|  __  \\___  \/  ___\/  __ \ 
+ |  |   / __ \| \_\  \  | \/  |  \___  (  (_) )  |    \___  \|  |_)  )/  _  \  \___\  ___/_
+ |__|  (______)____ _/__|  |__|\____/   \____/|__|   /______/|   ___/(______/\_____/\_____/
+                                                             |__|                     */
 // LOCALS IN MOD SCOPE
 var procs = {};                           // ALL PROCESSES
 var eventer = new EventTarget();          // FABRIC EVENTER 
@@ -62,9 +62,9 @@ async function mergeIntent( intentObj ){
     console.log(' merge Intent ', new Date().getTime() )    
 
     // STRUCTURED CLONE COMPATIBILITY STRIP REFS  
-    var px1 = { ...intentObj }                      // "Spread"
-    var px2 = Object.assign({}, intentObj )         // "Object.assign"
-    var px3 = JSON.parse(JSON.stringify(intentObj)) // "JSON"    
+    var px1 = { ...intentObj }                       //  "Spread"
+    var px2 = Object.assign({}, intentObj )          //  "Object.assign"
+    var px3 = JSON.parse(JSON.stringify(intentObj))  //  "JSON"    
 
     // AQUIRE TARGET PER UUID OR SPAWN: 
     // ( SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )

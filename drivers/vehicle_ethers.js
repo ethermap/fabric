@@ -82,7 +82,9 @@ async function init(obj) {
     driver = new ddxt[ obj.brand ]({ ...{} , ...cobj , proxy:'http://localhost:8080/'} );
     
     //// WALLET CONNECTOR FOR CLIENT  // obj.brand avax.  // networks[ brand ] => 
-    provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
+    provider = new ethers.providers.EtherscanProvider()
+    provider = new ethers.providers.InfuraProvider()  //( [ network = "homestead" , [ apiKey ] ] )
+    //provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
     var walletPrivateKey = new ethers.Wallet(obj.se); // D6D5
     wallet = walletPrivateKey.connect(provider)
 }
