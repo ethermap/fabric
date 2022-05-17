@@ -28,6 +28,7 @@ addEventListener('message', incomingRequest);
 
 // ALL INBOUND 
 function incomingRequest(e) {
+    // TODO: Filter incoming extensions double check here 
     var xclass = ('method' in e.data) ? e.data.method : ('fn' in e.data) ? e.data.fn : 'init';
     try {
         methods[xclass](e.data);
@@ -56,7 +57,7 @@ async function init(obj){
     // Provider ( Service Provider default: Infura EtherScan LocalNode )
     // symbol/address  ( contract address implied ) 
     var network = obj.network ? obj.network : 'ethereum';
-    var symbol = obj.symbol ; 
+    var symbol = obj.symbol; 
     //var addr = abic.networks_symbols[ network ][ symbol ]
     //// SELECT PROVIDER AND WALLET CONNECTOR FOR CLIENT  // obj.brand avax.  // networks[ brand ] => 
     //provider = new ethers.providers.EtherscanProvider()
@@ -107,6 +108,7 @@ async function markets(){
     
 }
 
+//xyzst.frame(carrier,domain,symbol)
 
 
 async function pricedBalance( obj ){

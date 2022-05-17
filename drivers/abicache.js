@@ -5,6 +5,13 @@
 // import { set,get , update,del, clear,keys,values,entries ,createStore } from './../../../web_modules/idb-keyval.js';
 import * as idbkv from './../../../web_modules/idb-keyval.js';
 import * as ethers from './ethers-5.6.esm.js';
+const customStore = idbkv.createStore('abicache-db', 'abicache-store');
+
+//import { set, createStore } from 'idb-keyval';
+
+
+
+//set('hello', 'world', customStore);
 
 
 
@@ -53,16 +60,26 @@ async function get( keyword_or_address='USDT' , network='ethereum' ){
         addr = keyword_or_address
     }
     var composit_cache_key = addr +'.'+network     
+
+
+    // var vls = await idbkv.keys()
+    // for( var v in vls ){
+    //     var k = vls[v]
+    //     console.log( k )
+    //     if( k != 'x' || k != 'v' ){
+    //         await idbkv.del( k )
+    //     }
+    // }
     
     return new Promise( async (resolve, reject) => {
-        var loc_abi = await idbkv.get( composit_cache_key )        
+        var loc_abi = await idbkv.get( composit_cache_key , customStore )        
         if( loc_abi ){
                                 // SEND BACK LOCAL DB 
             resolve( loc_abi )
         }else{
                                                 // GET ABI FROM ETHERSCAN SAVE LOCAL 
             let theabi = await fetchAbi( addr )
-            let savcod = await idbkv.set( composit_cache_key , theabi )        
+            let savcod = await idbkv.set( composit_cache_key , theabi , customStore )        
             var objOut = theabi; 
             resolve(  objOut )
         }
