@@ -13,9 +13,9 @@ var initObj = {}
 var cache ={}
 var access_count = 0;
 
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // AVAILABLE 
 var methods = { 

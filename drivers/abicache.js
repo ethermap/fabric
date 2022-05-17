@@ -43,13 +43,12 @@ async function get( keyword_or_address='USDT' , network='ethereum' ){
     // keyword_or_address in abi_map
     // check if its keyword and convert to address 
     var addr;
-    // STRAIGHT ADDRESS 
-    if( keyword_or_address.includes('0x') ){
+    
+    if( keyword_or_address.includes('0x') ){                 // STRAIGHT ADDRESS 
         addr = keyword_or_address;  
-    // LOCAL DIRECTORY  ( soon name.eth )
+                                                            // LOCAL DIRECTORY  ( soon name.eth )
     }else if( keyword_or_address in networks_symbols[ network ] ){
         addr = networks_symbols[ network ][ keyword_or_address ]
-    // 
     }else{
         addr = keyword_or_address
     }
@@ -58,24 +57,37 @@ async function get( keyword_or_address='USDT' , network='ethereum' ){
     return new Promise( async (resolve, reject) => {
         var loc_abi = await idbkv.get( composit_cache_key )        
         if( loc_abi ){
-            // SEND BACK LOCAL DB 
+                                // SEND BACK LOCAL DB 
             resolve( loc_abi )
         }else{
-            // GET ABI FROM ETHERSCAN SAVE LOCAL 
+                                                // GET ABI FROM ETHERSCAN SAVE LOCAL 
             let theabi = await fetchAbi( addr )
             let savcod = await idbkv.set( composit_cache_key , theabi )        
             var objOut = theabi; 
             resolve(  objOut )
         }
     });
+}
 
+// CONVENIENCE TO CONVERT SYMBOL TO ADDRESS ( for contracts )
+async function addr( symbol='WBTC' , network='ethereum' ){
+    
+    // ASYNC FOR ENS : 
+    // provider.resolveName
+    return new Promise( async (resolve, reject) => {
+        var addr_out ;
+        if( symbol in networks_symbols[ network ] ){
+            addr_out = networks_symbols[ network ][ symbol ]            
+        }else{
+            addr_out = 'UNKNOWN'
+        }
+        resolve( addr_out )
+    });
 }
 
 
 
-
-
-// LOAD ABI FROM REMOTE ETHERSCAN   TODO: Remove Shared API Key 
+// LOAD ABI FROM REMOTE ETHERSCAN   TODO: Remove Shared-API-Key 
 async function fetchAbi(addr_in) {
     // MAKE THIS MORE ROBUST WITH FALLBACKS TO LOCAL // 
     // OTHER SOURCES FOR OTHER NETWORKS - INTERNAL MAP 
@@ -92,7 +104,7 @@ async function fetchAbi(addr_in) {
 }
 
 
-export { get , networks_symbols }
+export { get , addr , networks_symbols }
 
 
 
