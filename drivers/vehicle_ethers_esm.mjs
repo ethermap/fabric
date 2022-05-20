@@ -67,9 +67,9 @@ async function init(obj){
     wallet = walletPrivateKey.connect( provider );
 
     // ANY AWAITS WILL SLOW DOWN THE INIT     
-    //var addr = abic.networks_symbols[ network ][ symbol ]
-    //var zabi = await abic.get( symbol )
-    //contract = new ethers.Contract(  addr , zabi , provider );
+    // var addr = abic.networks_symbols[ network ][ symbol ]
+    // var zabi = await abic.get( symbol )
+    // contract = new ethers.Contract(  addr , zabi , provider );
 
     var l = 1
 };
@@ -112,12 +112,11 @@ async function markets(){
 
 
 async function pricedBalance( obj ){
-    console.log( ' balance attempted on ', obj )
     
-    //var addrz = abic.networks_symbols[ 'ethereum' ][ obj.symbol ]
+    // console.log( ' balance attempted on ', obj )
+    // var addrz = abic.networks_symbols[ 'ethereum' ][ obj.symbol ]
     var addr = await abic.addr( obj.symbol )
     var zabi = await abic.get( obj.symbol )
-    var i = 3;
     contract = new ethers.Contract(  addr , zabi , provider );
 
     var outObj = obj; // SET OUTBOUND FROM INCOMING ( UUID / )

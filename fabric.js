@@ -75,6 +75,7 @@ async function mergeIntent( intentObj ){
     }else{
         const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
         // IF DRIVER EXISTS IN CCXT instead // 
+        // WORKER SUBCLASS ROUTING VIA XCLASS GLUEMAPPER?? // 
         // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
         const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : 'ethers_esm'+'.mjs';
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver;
@@ -94,7 +95,8 @@ async function mergeIntent( intentObj ){
         target_worker.postMessage( { ...px3 , method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]  } )
         // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
-            await utils.sleep(100);
+            await utils.sleep(1000);
+            // EXPERIMENT WITH CUE FOR INIT AND SEQUENTIAL ORDERS 
             target_worker.postMessage( px3 )    
         }
         // creds could be expanded to creds.keySelect( ['dom','domain','brand'] )

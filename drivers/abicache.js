@@ -29,9 +29,10 @@ var networks_symbols = {
     ethereum:{
         SHIB:'0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce',
         USDT:'0xdac17f958d2ee523a2206206994597c13d831ec7',
-        uniswap_router:0x9999999,
-        curve_router:0x99999,
-        oneinch_router:0x9999
+        WBTC:'0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        uniswap_router:'0x0000000000009999999',
+        curve_router:'0x00000000000000099999',
+        oneinch_router:'0x000000000000000009999'
     },
     avalanche:{
         BTC:'0x0x0x0x0x0'
@@ -61,23 +62,26 @@ async function get( keyword_or_address='USDT' , network='ethereum' ){
     }
     var composit_cache_key = addr +'.'+network     
 
-
-    // var vls = await idbkv.keys()
-    // for( var v in vls ){
-    //     var k = vls[v]
-    //     console.log( k )
-    //     if( k != 'x' || k != 'v' ){
-    //         await idbkv.del( k )
+    // burnsKVS 
+    // function deleteAll( d ){
+    //     var vls = await idbkv.keys()
+    //     for( var v in vls ){
+    //         var k = vls[v]
+    //         console.log( k )
+    //         if( k != 'x' || k != 'v' ){
+    //             await idbkv.del( k )
+    //         }
     //     }
-    // }
-    
+    // }       
+    // deleteAll()
+
     return new Promise( async (resolve, reject) => {
         var loc_abi = await idbkv.get( composit_cache_key , customStore )        
         if( loc_abi ){
                                 // SEND BACK LOCAL DB 
             resolve( loc_abi )
         }else{
-                                                // GET ABI FROM ETHERSCAN SAVE LOCAL 
+                                // GET ABI FROM ETHERSCAN SAVE LOCAL 
             let theabi = await fetchAbi( addr )
             let savcod = await idbkv.set( composit_cache_key , theabi , customStore )        
             var objOut = theabi; 
@@ -85,6 +89,8 @@ async function get( keyword_or_address='USDT' , network='ethereum' ){
         }
     });
 }
+
+ 
 
 // CONVENIENCE TO CONVERT SYMBOL TO ADDRESS ( for contracts )
 async function addr( symbol='WBTC' , network='ethereum' ){
