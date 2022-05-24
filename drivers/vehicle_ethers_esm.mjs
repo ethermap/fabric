@@ -14,8 +14,8 @@ var methods = { init , pricedBalance  }
 
 
 
-//https://raw.githubusercontent.com/ethers-io/ethers.js/master/packages/ethers/dist/ethers.esm.js
-import * as ethers from './ethers-5.6.esm.js';
+// https://raw.githubusercontent.com/ethers-io/ethers.js/master/packages/ethers/dist/ethers.esm.js
+import * as ethers from './ethers-5.7.esm.js';
 import * as abic from './abicache.js'
 // importScripts('./outcache.js');    
 
@@ -58,10 +58,10 @@ async function init(obj){
     // symbol/address  ( contract address implied ) 
     var network = obj.network ? obj.network : 'ethereum';
     var symbol = obj.symbol; 
-    //var addr = abic.networks_symbols[ network ][ symbol ]
-    //// SELECT PROVIDER AND WALLET CONNECTOR FOR CLIENT  // obj.brand avax.  // networks[ brand ] => 
-    //provider = new ethers.providers.EtherscanProvider()
-    //provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
+    // var addr = abic.networks_symbols[ network ][ symbol ]
+    // SELECT PROVIDER AND WALLET CONNECTOR FOR CLIENT  // obj.brand avax.  // networks[ brand ] => 
+    // provider = new ethers.providers.EtherscanProvider()
+    // provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
     provider = new ethers.providers.InfuraProvider()  //( [ network = "homestead" , [ apiKey ] ] )
     var walletPrivateKey = new ethers.Wallet(obj.se); // D6D5
     wallet = walletPrivateKey.connect( provider );
