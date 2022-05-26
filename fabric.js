@@ -77,7 +77,9 @@ async function mergeIntent( intentObj ){
         // IF DRIVER EXISTS IN CCXT instead // 
         // WORKER SUBCLASS ROUTING VIA XCLASS GLUEMAPPER?? // 
         // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
-        const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : 'ethers_esm'+'.mjs';
+
+        const selected_driver = ( 'driver' in intentObj ) ? intentObj.driver +'.mjs': 'ethers_esm'+'.mjs'
+        const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : selected_driver;
         const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver;
         
         // CHECK IF WORKER.CLASSIC or WORKER.MODULE

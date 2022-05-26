@@ -43,11 +43,22 @@
 				// await fabric.mergeIntent(  { dom:'binanceus' , carrier:'binanceus', driver:'ccxt',  method:'init' ,        uuid:'0x1c2c2c22'   } );
 				// init / launch of each worker should happen automatically based on existence of intent: 
 				// await fabric.mergeIntent( { brand:'ethereum' , uuid:'0x1c2c2c22' , symbol:'ETH/USDT'   } )
+
+				// fabric.facilitate
+				// fabric.support( )
+				// fabric.mergeIntent( )
+
 				await fabric.mergeIntent( { 
-						brand:'ethereum', 
+						brand:'github', 
+						driver:'github_esm',	
 						method:'pricedBalance', 
 						uuid:'0x1c2c2cdd22', 
-						symbol:'SHIB'     } );
+						symbol:'SHIB'     } );				
+				// await fabric.mergeIntent( { 
+				// 		brand:'ethereum', 
+				// 		method:'pricedBalance', 
+				// 		uuid:'0x1c2c2cdd22', 
+				// 		symbol:'SHIB'     } );
  
 				// await fabric.mergeIntent( 
 				// { 
