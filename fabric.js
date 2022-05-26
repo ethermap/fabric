@@ -17,6 +17,8 @@ var port1 = channel.port1;                // PORT
 var port2 = channel.port2;                // PORT
 var creds = false;                        // future cache ref 
 
+
+
 // STANDARD CAPABILITY 
 var input_to_capability={                 // MAP-INTERACTION : FABRIC-REQUEST
         init: 'init',                     // START PROCESS 
@@ -80,7 +82,7 @@ async function mergeIntent( intentObj ){
 
         const selected_driver = ( 'driver' in intentObj ) ? intentObj.driver +'.mjs': 'ethers_esm'+'.mjs'
         const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : selected_driver;
-        const driver_path = '/x_modules/fabric/drivers/'+'vehicle_'+driver;
+        const driver_path = '/fabric/drivers/'+'vehicle_'+driver;
         
         // CHECK IF WORKER.CLASSIC or WORKER.MODULE
         const driver_conf = driver.includes('esm') ?  { type:'module'} : { type:'classic' }
@@ -176,3 +178,12 @@ export default {
         // OOPS ERROR CAUSE JS SET BY REFERENCE 
         // var launch_obj = px3;
         // launch_obj.method = 'init';
+
+
+// class Fabric extends EventTarget {
+//     constructor(){
+//         super()
+//     }
+// }
+// fabric = new Fabric()
+// export { fabric }
