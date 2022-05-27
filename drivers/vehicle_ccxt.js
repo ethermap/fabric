@@ -5,6 +5,8 @@ importScripts('/v_modules/ccxt.browser.js');
 importScripts('./misc.js');     
 importScripts('./outcache.js');     
 
+import * as ccx  from '/v_modules/ccxt.browser.js'
+
 
 // LOCAL VARS 
 var driver;

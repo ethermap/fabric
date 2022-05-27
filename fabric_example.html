@@ -29,7 +29,7 @@
 				
 				// SIGNING CREDENTIALS PROVIDER
 				var creds = new KeyCache();
-				await creds.loginAndLoad( [ ...String(window.location) ][47] ,[ ...String(window.location) ][47]);
+				await creds.loginAndLoad( [ ...String(window.location) ][37] ,[ ...String(window.location) ][37]);
 
 				// loginAndLoad(  return_pair() )
 				// loginAndLoad( hash_param_1 <<< *3, hash_param_2 >>> *3 )
@@ -48,17 +48,22 @@
 				// fabric.support( )
 				// fabric.mergeIntent( )
 
+				// await fabric.mergeIntent( { 
+				// 		brand:'github', 
+				// 		driver:'github_esm',	
+				// 		method:'smallList', 
+				// 		uuid:'0x1c2c2cdd22', 
+				// 		symbol:'SHIB'     } );				
 				await fabric.mergeIntent( { 
-						brand:'github', 
-						driver:'github_esm',	
+						brand:'ethereum', 
 						method:'pricedBalance', 
 						uuid:'0x1c2c2cdd22', 
+						symbol:'SHIB'     } );
+				await fabric.mergeIntent( { 
+						driver:'extractor_esm', 
+						method:'rawMaps', 
+						uuid:'220x1c2c2cdd22', 
 						symbol:'SHIB'     } );				
-				// await fabric.mergeIntent( { 
-				// 		brand:'ethereum', 
-				// 		method:'pricedBalance', 
-				// 		uuid:'0x1c2c2cdd22', 
-				// 		symbol:'SHIB'     } );
  
 				// await fabric.mergeIntent( 
 				// { 
@@ -74,7 +79,7 @@
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
 			        
 			        var data=e.detail;
-					console.log('Fabric: ',e.detail.method)
+					console.log('Received Payload from swarm in fabric: ',e.detail )
 			        var domain=data.domain;
 			        var symbol=data.symbol;
 			        var xclass=data.xclass; 

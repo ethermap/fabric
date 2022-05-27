@@ -1,7 +1,8 @@
+        
 
 
-import * as ccx  from '/v_modules/ccxt.browser.js'
 import * as utils from './drivers/utils.js'
+import * as ccx  from '/v_modules/ccxt.browser.js'
 
 /*_____      ___            __                 _____                                     
 _/  ___\____ \_ |___ ______|__| ____     _____/  ___\  _____________ ______  _____  _____  
@@ -43,13 +44,20 @@ function messageToWorker( intentObj ){
 // MESSAGE FROM WORKERS: 
 function messageFromWorker( e ){
     var messageObject = e.data;
-    // USE SELF REPORT EVENTS TO ADD WORKER METADATA 
+    
+    // USE SELF REPORT EVENTS TO ADD SUCCESSFUL WORKERS METADATA 
     if( messageObject.method == 'report'){
-        procs[ messageObject.uuid ]['wid']=messageObject['wid'];
+        procs[ messageObject.uuid ]['wid'] = messageObject['worker_id'];
+        console.log(' PROCS AFTER LAST REPORT: ')
+        for( var p in procs ){
+            console.log( p , ' : ', procs[p] )
+        }
+    }else{
+        // PROPAGATE MESSAGES ONWARDS AS EVENTS 
+        dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
+        //console.log('Fabric: ', e.data.method  , e.data );        
     }
-    // PROPAGATE MESSAGES AS EVENTS 
-    dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
-    //console.log('Fabric: ', e.data.method  , e.data );
+    
 }
 
 // MESSAGE ERROR FROM WORKER 
@@ -61,42 +69,40 @@ async function errorFromWorker( e ){
 
 // GENERAL PROC STARTER 
 async function mergeIntent( intentObj ){
-    console.log(' merge Intent ', new Date().getTime() )    
 
-    // STRUCTURED CLONE COMPATIBILITY STRIP REFS  
-    var px1 = { ...intentObj }                       //  "Spread"
-    var px2 = Object.assign({}, intentObj )          //  "Object.assign"
-    var px3 = JSON.parse(JSON.stringify(intentObj))  //  "JSON"    
-
-    // AQUIRE TARGET PER UUID OR SPAWN: 
-    // ( SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
     var target_worker;
-    if( procs[ intentObj.uuid ] ){ 
-        target_worker = procs[ intentObj.uuid ].worker;
+    if( procs[ intentObj.uuid ] ){                      // EXISTING PROCESS OR SPAWN: 
+        target_worker = procs[ intentObj.uuid ].worker; // SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
         target_worker.postMessage( intentObj );
     }else{
-        const basePath = (''+location+'').replace(/\/[^/]+$/, '/'); //PRE_SHAKEN IMPORT DEPS 
-        // IF DRIVER EXISTS IN CCXT instead // 
-        // WORKER SUBCLASS ROUTING VIA XCLASS GLUEMAPPER?? // 
-        // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
 
         const selected_driver = ( 'driver' in intentObj ) ? intentObj.driver +'.mjs': 'ethers_esm'+'.mjs'
         const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : selected_driver;
-        const driver_path = '/fabric/drivers/'+'vehicle_'+driver;
+        //const driver_path = '/fabric/drivers/'+'vehicle_'+driver;
+        var container_path = './container.js';
         
-        // CHECK IF WORKER.CLASSIC or WORKER.MODULE
+                                                        // CHECK IF WORKER.CLASSIC or WORKER.MODULE 
         const driver_conf = driver.includes('esm') ?  { type:'module'} : { type:'classic' }
-        target_worker = new Worker( driver_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
+        target_worker = new Worker( container_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         target_worker.addEventListener('message', messageFromWorker );        
         target_worker.addEventListener('onerror', messageFromWorker );      
 
-        // INSERT PROCESS 
-        procs[ intentObj.uuid ] = { worker:target_worker }; 
-
-        // TODO: CHECK IF CREDENTIALS IN px3 
+        
+         
+                                                         // TODO: CHECK IF CREDENTIALS IN px3 
+                                                         // STRUCTURED CLONE COMPATIBILITY STRIP REFS  //console.log(' merge Intent ', new Date().getTime() )    
+        var px1 = { ...intentObj }                       //  "Spread"
+        var px2 = Object.assign({}, intentObj )          //  "Object.assign"
+        var px3 = JSON.parse(JSON.stringify(intentObj))  //  "JSON"            
         // IN ABSENCE OF KEYSTORE and USE MANUALLY ADDED 
         // UNREGISTERED WORKER MUST FIRE INIT BEFORE FINAL ( init last to overwrite )
-        target_worker.postMessage( { ...px3 , method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]  } )
+        // Here is UUID from Credential Provider supposed to overwrite the UUID set ? 
+        // Suppose it can't because it already has precedent in the map or UI 
+        let intentObjFused = { method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]   , ...px3 } 
+        target_worker.postMessage( intentObjFused )
+
+        procs[ intentObjFused.uuid ] = { worker:target_worker };  // INSERT PROCESS
+        
         // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
             await utils.sleep(1000);

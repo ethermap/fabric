@@ -39,3 +39,22 @@ fetch( urlx )
 					   
 		})
 		.catch( error => console.error(error));
+
+
+export async function smallList(){
+	fetch( urlx )
+			.then(response => response.json()) //Converting the response to a JSON object
+			.then( data => 
+			{ 
+				console.log(data)
+				for ( var i in data ){
+	
+					console.log( data[i].full_name )
+				}
+				return [1,1,1,1,1]
+						   
+			})
+			.catch( error => console.error(error));
+	
+}
+
