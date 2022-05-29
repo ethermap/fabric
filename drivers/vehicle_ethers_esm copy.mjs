@@ -13,7 +13,6 @@ var methods = { init , pricedBalance  }
 // abi 
 
 
-
 // https://raw.githubusercontent.com/ethers-io/ethers.js/master/packages/ethers/dist/ethers.esm.js
 import * as ethers from './ethers-5.7.esm.js';
 import * as abic from './abicache.js'

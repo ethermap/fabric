@@ -6,17 +6,27 @@
 //  (_)   (_)(_______)(_)   (_)|_|(_______)(_)      (_______)  
 //   _     _  _____    _______  _  _        _        _____     
 //  | |   | ||  ___)_ |  ___  || || |_____ | |_____ |  ___)_   //
-//   \\___// |_______)|_|   |_||_| \______)|_______)|_______)  //
-//    _____ _____ _____ _____ _____ _____ _____ _____ _____    //
+//   \\___// |_______)|_|   |_||_| \______)|_______)|_____ \   //
+//    \___/ _____ _____ _____ _____ _____ _____ _____ ____\ \  //
 //  .|     |     |   | |_   _|  _  |     |   | |   __| __  |.  //
 //  .|   --|  |  | | | | | | |     |-   -| | | |   __|    -|.  //
 //   |_____|_____|_|___| |_| |__|__|_____|_|___|_____|__|__|   //
+
+// import * as ccx  from './drivers/ccxtesbuilt.js'
+import * as entities from './entities.js'
+import * as ccx  from './drivers/ccxt.browser.js'
+import * as util from './drivers/util.js'
+
+//import * as ccx  from '/drivers/ccxtesbuilt2.js'
                                                          
+
+console.log(' Process Container running  ')
 
 // PROCESS CONTAINER // STATE STRUCT 
 var state = {
     access_count: 0,   
     stack_trace_buffer:[] ,
+    uuid: false, 
     worker_id:'w'+ Math.round( Math.random()*99999 ), // UUID EXTRINSIC 
     op_tick:{  returned_scope_closure:0   },
     messageStruct: {
@@ -37,15 +47,31 @@ async function inboundMessage( e ) {
     
     // WRAP EVERY MESSAGE INVOCATION TO PREVENT JANK UPSTREAM 
     try {
-
         // HOW DOES THE PROCESS CONTAINER GET SUPPORTED DRIVER METHODS ?
         // CAN WE USE DRIVER EXPROTS TO BE STANDARD 
         if( state.driver ){
-            // Should this be .then( closure ) to enable multiple: 
-            var resObj = await state.driver[ xclass ]( e.data );    
-            outboundMessage( resObj )
+            
+            // CALL FOREIGN METHOD 
+            state.driver[ xclass ]( e.data )
+                .then( function( objf ){
+                    
+                    var resObj = {}
+                    resObj['method'] = xclass;
+                    resObj['foreignMethod'] = xclass;
+                    resObj['uuid'] = e.data.uuid
+                    resObj['payload'] = objf
+                    outboundMessage( resObj )    
+                })
+                .catch( err => {
+
+                    console.log(' Container Foreign call error:  ', err )
+                })
+            
+            
         }else{
+            //console.log( 'firing pre init: ')
             init( e.data )
+            //console.log( 'firing post init: ')
         }
         
     } catch (err) {
@@ -74,16 +100,24 @@ async function init( obj ){
     // IF DRIVER EXISTS IN CCXT instead // 
     // WORKER SUBCLASS ROUTING VIA XCLASS GLUEMAPPER?? // 
     // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
+
+    // await util.sleep( 5000 )
+    // util.elapsed() 
     
+    // SHOULD IT ACTUALLY 
+    var isd = { type:'module'}
     const selected_driver = ( 'driver' in obj ) ? obj.driver +'.mjs': 'ethers_esm'+'.mjs'
-    //const driver = ( obj.brand in ccxt ) ? 'ccxt'+'.js' : selected_driver;
-    
+    const driver = ( ('brand' in obj) && (obj.brand in ccxt) ) ? 'ccxt'+'.js' : selected_driver;
     const driver_path = './drivers/'+'vehicle_'+selected_driver;
+    
+    // DYNO IMPORT SHOULD BE MODULE REPO GLUEMAPPER MATRIX 
     state.driver = await import( driver_path );
+    
+    // INIT IF NEEDS STATE 
     try{
         state.driver.init( obj )    
     }catch( err ){
-        console.log('driver.init fail on ',err, obj )
+        //console.log('driver.init fail on ',err, obj )
     }
     
 

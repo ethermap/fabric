@@ -1,8 +1,8 @@
         
 
 
-import * as utils from './drivers/utils.js'
-import * as ccx  from '/v_modules/ccxt.browser.js'
+import * as util from './drivers/util.js'
+import * as ccx  from './drivers/ccxt.browser.js'
 
 /*_____      ___            __                 _____                                     
 _/  ___\____ \_ |___ ______|__| ____     _____/  ___\  _____________ ______  _____  _____  
@@ -44,16 +44,26 @@ function messageToWorker( intentObj ){
 // MESSAGE FROM WORKERS: 
 function messageFromWorker( e ){
     var messageObject = e.data;
+
+    // REJECT IF NO METHOD OR DATA 
+    if( ! messageObject ) return
+    if( !('method' in messageObject) ) return 
     
     // USE SELF REPORT EVENTS TO ADD SUCCESSFUL WORKERS METADATA 
     if( messageObject.method == 'report'){
         procs[ messageObject.uuid ]['wid'] = messageObject['worker_id'];
-        console.log(' PROCS AFTER LAST REPORT: ')
+        console.log('        report( ')
         for( var p in procs ){
-            console.log( p , ' : ', procs[p] )
+            console.log('              ', p , ' : ', procs[p] )
         }
     }else{
         // PROPAGATE MESSAGES ONWARDS AS EVENTS 
+        // fabricEvent struct 
+        // { foreign_method:
+        //           method:  
+        //             uuid:
+        //          payload:
+        // }
         dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
         //console.log('Fabric: ', e.data.method  , e.data );        
     }
@@ -70,27 +80,26 @@ async function errorFromWorker( e ){
 // GENERAL PROC STARTER 
 async function mergeIntent( intentObj ){
 
+    // ENSURE UUID LINKAGE
+    if( ! ('uuid' in intentObj) ) intentObj.uuid = util.uuidv4()
+
+
+    // MESSAGE EXISTING OR SPAWN 
     var target_worker;
     if( procs[ intentObj.uuid ] ){                      // EXISTING PROCESS OR SPAWN: 
         target_worker = procs[ intentObj.uuid ].worker; // SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
         target_worker.postMessage( intentObj );
     }else{
-
-        const selected_driver = ( 'driver' in intentObj ) ? intentObj.driver +'.mjs': 'ethers_esm'+'.mjs'
-        const driver = ( intentObj.brand in ccxt ) ? 'ccxt'+'.js' : selected_driver;
-        //const driver_path = '/fabric/drivers/'+'vehicle_'+driver;
-        var container_path = './container.js';
         
-                                                        // CHECK IF WORKER.CLASSIC or WORKER.MODULE 
-        const driver_conf = driver.includes('esm') ?  { type:'module'} : { type:'classic' }
-        target_worker = new Worker( container_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
+        // CHECK IF WORKER.CLASSIC or WORKER.MODULE 
+        const driver_conf = { type:'module' } // driver.includes('esm') ?  { type:'module'} : { type:'classic' }
+        const container_path = './container.js';
+        var target_worker = new Worker( container_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         target_worker.addEventListener('message', messageFromWorker );        
         target_worker.addEventListener('onerror', messageFromWorker );      
-
-        
          
                                                          // TODO: CHECK IF CREDENTIALS IN px3 
-                                                         // STRUCTURED CLONE COMPATIBILITY STRIP REFS  //console.log(' merge Intent ', new Date().getTime() )    
+        // STRUCTURED CLONE COMPATIBILITY STRIP REFS  //console.log(' merge Intent ', new Date().getTime() )    
         var px1 = { ...intentObj }                       //  "Spread"
         var px2 = Object.assign({}, intentObj )          //  "Object.assign"
         var px3 = JSON.parse(JSON.stringify(intentObj))  //  "JSON"            
@@ -105,7 +114,7 @@ async function mergeIntent( intentObj ){
         
         // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
-            await utils.sleep(1000);
+            await util.sleep(1000);
             // EXPERIMENT WITH CUE FOR INIT AND SEQUENTIAL ORDERS 
             target_worker.postMessage( px3 )    
         }
