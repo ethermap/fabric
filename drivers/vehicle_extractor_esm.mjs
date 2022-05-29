@@ -14,16 +14,15 @@ async function rawMaps(){
         fetch("/data/miccco/mega.json")
           .then(response => response.json())
           .then(json => {
-              console.log(' archive: ')
-              console.log(json)
-          
+      
+                var rwmap ={
+                    nodes:json,
+                    links:{},
+                    meta:{}
+                }
+                resolve( rwmap )
           });
-        var rwmap ={
-            nodes:{a:19},
-            links:{},
-            meta:{}
-        }
-        resolve( rwmap )
+
     })
 }
 
