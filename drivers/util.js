@@ -20,6 +20,12 @@ async function sleep(ms) {
 }
 
 
+function delay(milisec){
+    return new Promise(resolve => {
+        setTimeout(() => { resolve('') }, milisec);
+    })
+}			
+
 
 
 
