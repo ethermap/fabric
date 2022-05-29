@@ -14,7 +14,7 @@
 
 // import * as ccx  from './drivers/ccxtesbuilt.js'
 import * as entities from './entities.js'
-import * as ccx  from './drivers/ccxt.browser.js'
+//import * as ccx  from './drivers/ccxt.browser.js'
 import * as util from './drivers/util.js'
 
 //import * as ccx  from '/drivers/ccxtesbuilt2.js'
@@ -103,11 +103,13 @@ async function init( obj ){
 
     // await util.sleep( 5000 )
     // util.elapsed() 
+
+
     
     // SHOULD IT ACTUALLY 
     var isd = { type:'module'}
     const selected_driver = ( 'driver' in obj ) ? obj.driver +'.mjs': 'ethers_esm'+'.mjs'
-    const driver = ( ('brand' in obj) && (obj.brand in ccxt) ) ? 'ccxt'+'.js' : selected_driver;
+    const driver = ( ('brand' in obj) && (obj.brand in entities) ) ? 'ccxt'+'.js' : selected_driver;
     const driver_path = './drivers/'+'vehicle_'+selected_driver;
     
     // DYNO IMPORT SHOULD BE MODULE REPO GLUEMAPPER MATRIX 

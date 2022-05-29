@@ -13,7 +13,7 @@ var methods = { init , pricedBalance  }
 // abi 
 //xyzst.frame(carrier,domain,symbol)
 
-
+console.log(' intepretting vehicle ethers ')
 
 // https://raw.githubusercontent.com/ethers-io/ethers.js/master/packages/ethers/dist/ethers.esm.js
 import * as ethers from './ethers-5.7.esm.js';

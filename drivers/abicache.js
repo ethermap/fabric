@@ -4,7 +4,6 @@
 // Translate ENS 
 // import { set,get , update,del, clear,keys,values,entries ,createStore } from './../../../web_modules/idb-keyval.js';
 import * as idbkv from './../../../web_modules/idb-keyval.js';
-import * as ethers from './ethers-5.6.esm.js';
 const customStore = idbkv.createStore('abicache-db', 'abicache-store');
 
 //import { set, createStore } from 'idb-keyval';
