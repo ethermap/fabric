@@ -1,4 +1,6 @@
-const nodes = {
+export var g = 77 ; 
+// nodes from CCXT fork mirrored to 
+export var nodes = {
     'aax':                     './js/aax.js',
     'aofex':                   './js/aofex.js',
     'ascendex':                './js/ascendex.js',
@@ -115,4 +117,4 @@ const nodes = {
 }
 
 
-export { nodes }
+ 

@@ -15,11 +15,9 @@ const customStore = idbkv.createStore('abicache-db', 'abicache-store');
 
 
 var abi_map = {
-
-
+ 
     SHIB: 0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE
-
-    
+ 
 }
 
 

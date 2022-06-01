@@ -93,7 +93,7 @@ async function mergeIntent( intentObj ){
         
         // CHECK IF WORKER.CLASSIC or WORKER.MODULE 
         const driver_conf = { type:'module' } // driver.includes('esm') ?  { type:'module'} : { type:'classic' }
-        const container_path = './container.js';
+        const container_path = './container.mjs';
         var target_worker = new Worker( container_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         target_worker.addEventListener('message', messageFromWorker );        
         target_worker.addEventListener('onerror', messageFromWorker );      
@@ -108,11 +108,11 @@ async function mergeIntent( intentObj ){
         // Here is UUID from Credential Provider supposed to overwrite the UUID set ? 
         // Suppose it can't because it already has precedent in the map or UI 
         let intentObjFused = { method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]   , ...px3 } 
-        target_worker.postMessage( intentObjFused )
-
         procs[ intentObjFused.uuid ] = { worker:target_worker };  // INSERT PROCESS
-        
-        // SECOND MESSAGE SENDS ORIGINAL FIRST INTENT OBJECT 
+
+        // 1ST MESSAGE   SENDS INIT 
+        target_worker.postMessage( intentObjFused )
+        // 2ND MESSAGE   SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
             await util.sleep(1000);
             // EXPERIMENT WITH CUE FOR INIT AND SEQUENTIAL ORDERS 

@@ -30,51 +30,49 @@
 					[ ...String(window.location) ][37] );
 				fabric.init( {creds:creds} )	
 				
-
-			
-				fabric.mergeIntent( { 
-						driver:'github_esm',	
-						method:'smallList' } )			
-
-				fabric.mergeIntent( { 
-						driver:'github_esm',	
-						method:'smallList' } )			
-
-				fabric.mergeIntent( { 
-						driver:'github_esm',	
-				 		method:'smallList' } )			
-
-				fabric.mergeIntent( { 
-						driver:'github_esm',	
-						method:'smallList' } )	
-
-				
-				
-				fabric.mergeIntent( { 
-						driver:'extractor_esm', 
-						method:'rawMaps', 
-						uuid:'220x1c2c2cdd22', 
-						symbol:'SHIB'     } )		
-				
-				fabric.mergeIntent( { 
-						brand:'ethereum', 
-						method:'pricedBalance', 
-						uuid:'0x1wwwwc2c2cdd22', 
-						symbol:'SHIB'     } )
+ 
+				// fabric.mergeIntent( { 
+				// 	    worker:'github.js',
+				// 		driver:'github_esm',	
+				// 		method:'smallList' } )			
 
 				// fabric.mergeIntent( { 
-				//      brand:'coinbasepro'  , 
-				//      method:'pricedBalances', 
-				//      uuid:'0x1c2c2c22' 
-				// } );				
+				// 		driver:'github_esm',	
+				// 		method:'smallList' } )			
+
+				// fabric.mergeIntent( { 
+				// 		driver:'github_esm',	
+				//  		method:'smallList' } )			
+
+				// fabric.mergeIntent( { 
+				// 		driver:'github_esm',	
+				// 		method:'smallList' } )	
+
+				// fabric.mergeIntent( { 
+				// 		driver:'extractor_esm', 
+				// 		method:'rawMaps', 
+				// 		uuid:'220x1c2c2cdd22', 
+				// 		symbol:'SHIB'     } )		
+				
+				// fabric.mergeIntent( { 
+				// 		brand:'ethereum', 
+				// 		method:'pricedBalance', 
+				// 		uuid:'0x1wwwwc2c2cdd22', 
+				// 		symbol:'SHIB'     } )
+
+				fabric.mergeIntent( { 
+				     brand:'coinbasepro'  , 
+				     method:'pricedBalances', 
+				     uuid:'0x1c2c2c22' 
+				} );				
 
 
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
-			        
+					
 			        var data=e.detail;
-					console.log('     onFabricEvent: ',e.detail.method , ' : ', e.detail.payload )
-
+					console.log('     onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
 			        var i=0;
+					
 			    })						
 			});
 		</script>

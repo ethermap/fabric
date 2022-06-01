@@ -41,9 +41,14 @@ var state = {
 
 // ALL INBOUND EVENTS ON DOWNSTREAM 
 async function inboundMessage( e ) { 
+    
     // TODO: Filter incoming extensions double check here 
     // message enveloper decrypt then route 
     var xclass = ('method' in e.data) ? e.data.method : ('fn' in e.data) ? e.data.fn : 'init';
+
+    
+    // BAM CACHE BLAST //  YES ! so cool cache at module level !! :) 
+    // cacheBusPost( responseObj )
     
     // WRAP EVERY MESSAGE INVOCATION TO PREVENT JANK UPSTREAM 
     try {
@@ -53,25 +58,21 @@ async function inboundMessage( e ) {
             
             // CALL FOREIGN METHOD 
             state.driver[ xclass ]( e.data )
-                .then( function( objf ){
-                    
-                    var resObj = {}
-                    resObj['method'] = xclass;
-                    resObj['foreignMethod'] = xclass;
-                    resObj['uuid'] = e.data.uuid
-                    resObj['payload'] = objf
-                    outboundMessage( resObj )    
-                })
-                .catch( err => {
-
-                    console.log(' Container Foreign call error:  ', err )
-                })
-            
-            
+            .then( function( returned_payload ){
+                var resObj = {}
+                resObj['method'] = xclass;
+                resObj['foreignMethod'] = xclass;
+                resObj['uuid'] = e.data.uuid
+                resObj['payload'] = returned_payload
+                outboundMessage( resObj )    
+            })
+            .catch( err => {
+                console.log(' Container Foreign call error:  ', err )
+            })            
         }else{
-            //console.log( 'firing pre init: ')
+            // console.log( 'firing pre  init: ')            
             init( e.data )
-            //console.log( 'firing post init: ')
+            // console.log( 'firing post init: ')
         }
         
     } catch (err) {
@@ -108,9 +109,11 @@ async function init( obj ){
     
     // SHOULD IT ACTUALLY 
     var isd = { type:'module'}
-    const selected_driver = ( 'driver' in obj ) ? obj.driver +'.mjs': 'ethers_esm'+'.mjs'
-    const driver = ( ('brand' in obj) && (obj.brand in entities) ) ? 'ccxt'+'.js' : selected_driver;
-    const driver_path = './drivers/'+'vehicle_'+selected_driver;
+    
+    var driver = ( ('brand' in obj) && (obj.brand in entities.nodes) ) ? 'ccxt_esm'+'.mjs' : selected_driver;
+    driver = ( 'driver' in obj ) ? obj.driver +'.mjs': driver
+    
+    var driver_path = './drivers/'+'vehicle_'+driver;
     
     // DYNO IMPORT SHOULD BE MODULE REPO GLUEMAPPER MATRIX 
     state.driver = await import( driver_path );
@@ -119,12 +122,12 @@ async function init( obj ){
     try{
         state.driver.init( obj )    
     }catch( err ){
-        //console.log('driver.init fail on ',err, obj )
+        console.log('container.init fail on ',err, obj )
     }
     
 
     // THIS ENABLES PROC LIST in QNAV ( COULD BE SUPERCLASS IN FUTURE )
-    postMessage({ method: 'report', worker_id: state.worker_id, driver:selected_driver , domain:obj.domain , uuid:obj.uuid  });    
+    postMessage({ method: 'report', worker_id: state.worker_id, driver:driver , domain:obj.domain , uuid:obj.uuid  });    
     var l = 3;
 
 }

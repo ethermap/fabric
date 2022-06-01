@@ -40,29 +40,27 @@ var urlx2 = 'https://api.github.com/users/psytron'
 // 		})
 // 		.catch( error => console.error(error));
 
+
 async function smallList(){
 	return new Promise( (resolve,reject)=>{
 		fetch( urlx )
-				.then( response => response.json()) //Converting the response to a JSON object
-				.then( data => 
-				{ 
-					// console.log(data)
-					// for ( var i in data ){
+			.then( response => response.json()) //Converting the response to a JSON object
+			.then( (data )=> 
+			{ 
+				// console.log(data)
+				// for ( var i in data ){
+				//     console.log( data[i].full_name )
+				// }
+				resolve( data )
+						   
+			})
+			.catch( ( error )=> 
+			{
+				console.error( error )
+				console.log(' exc ')
+			});
 		
-					// 	console.log( data[i].full_name )
-					// }
-					
-					resolve( data )
-							   
-				})
-				.catch( error => console.error(error));
-
-
-
-		
-	})
-
-	
+	})	
 }
 
 export { smallList }
