@@ -9,6 +9,7 @@
 
 
 async function rawMaps(){
+    console.log(' raw maps called in worke ')
     return new Promise( ( resolve , reject )=>{
         // search dirs
         fetch("/data/miccco/mega.json")

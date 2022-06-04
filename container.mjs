@@ -47,7 +47,7 @@ async function inboundMessage( e ) {
     var xclass = ('method' in e.data) ? e.data.method : ('fn' in e.data) ? e.data.fn : 'init';
 
     
-    // BAM CACHE BLAST //  YES ! so cool cache at module level !! :) 
+    // OUTBOUND CACHE BLAST 
     // cacheBusPost( responseObj )
     
     // WRAP EVERY MESSAGE INVOCATION TO PREVENT JANK UPSTREAM 
@@ -93,6 +93,7 @@ addEventListener('message', inboundMessage );
 
 // SUBSCRIBE OUTBOUND EVENTS 
 async function init( obj ){
+    
     // THIS SHOULD WORK  EMPTY , IT SOULD SHUT DOWNSTREAM//
     // PARTIALLY POPOULATED iT WILL GET WHAT IT CAN 
     // FOR EXAMPLE NO CREDITS FOR  Extractor of files , or login session 
@@ -101,17 +102,24 @@ async function init( obj ){
     // IF DRIVER EXISTS IN CCXT instead // 
     // WORKER SUBCLASS ROUTING VIA XCLASS GLUEMAPPER?? // 
     // const driver = ('driver' in intentObj)?intentObj.driver:'ethers';
-
     // await util.sleep( 5000 )
     // util.elapsed() 
 
 
+    // SELECT DRIVER 
+    var driver;
+    if( 'brand' in obj ){
+        if( obj.brand in entities.nodes ){
+            driver = 'ccxt_esm.mjs';     
+        }else{
+            driver = 'ethers_esm.mjs'
+        }
+    }else if( 'driver' in obj ){
+        driver = obj.driver + '_esm.mjs'
+    }else{
+        driver = 'default_esm.mjs'
+    }
     
-    // SHOULD IT ACTUALLY 
-    var isd = { type:'module'}
-    
-    var driver = ( ('brand' in obj) && (obj.brand in entities.nodes) ) ? 'ccxt_esm'+'.mjs' : selected_driver;
-    driver = ( 'driver' in obj ) ? obj.driver +'.mjs': driver
     
     var driver_path = './drivers/'+'vehicle_'+driver;
     
@@ -122,7 +130,7 @@ async function init( obj ){
     try{
         state.driver.init( obj )    
     }catch( err ){
-        console.log('container.init fail on ',err, obj )
+        console.log('container.init Non-Exist on ', obj , 'err: ',err )
     }
     
 

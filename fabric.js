@@ -17,6 +17,7 @@ var channel = new MessageChannel();       // FOR WORKER PORTS
 var port1 = channel.port1;                // PORT
 var port2 = channel.port2;                // PORT
 var creds = false;                        // future cache ref 
+                                          // should operate with pre injected creds 
 
 
 
@@ -107,7 +108,10 @@ async function mergeIntent( intentObj ){
         // UNREGISTERED WORKER MUST FIRE INIT BEFORE FINAL ( init last to overwrite )
         // Here is UUID from Credential Provider supposed to overwrite the UUID set ? 
         // Suppose it can't because it already has precedent in the map or UI 
-        let intentObjFused = { method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]   , ...px3 } 
+        // let intentObjFused = { method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]   , ...px3 } 
+        // remove internal credential provider for simplicity for now // creds are embedded outside 
+        
+        let intentObjFused = { method:'init' , ...px3 } 
         procs[ intentObjFused.uuid ] = { worker:target_worker };  // INSERT PROCESS
 
         // 1ST MESSAGE   SENDS INIT 
