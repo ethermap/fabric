@@ -6,24 +6,32 @@
 // 3. bubble it up as message so it can be loaded into vault 
 
 
+function fetchWrapped( url_in ){
+    return new Promise( ( resolve , reject )=>{
+
+        fetch( url_in )
+        .then(response => response.json())
+        .then(json => {
+            resolve( json )
+        });    
+        
+    } )
+}
+
+
 
 
 async function rawMaps(){
     console.log(' raw maps called in worke ')
     return new Promise( ( resolve , reject )=>{
-        // search dirs
-        fetch("/data/miccco/mega.json")
-          .then(response => response.json())
-          .then(json => {
-      
-                var rwmap ={
-                    nodes:json,
-                    links:{},
-                    meta:{}
-                }
-                resolve( rwmap )
-          });
 
+        var promise1 = fetchWrapped( "/data/demo/mega.json" )
+        var promise2 = fetchWrapped( "/data/demo/mega.json" )
+        var promise3 = fetchWrapped( "/data/demo/mega.json" )
+        Promise.all([ promise1 , promise2 , promise3 ]).then( (values) => {
+
+            resolve( values )
+        });
     })
 }
 

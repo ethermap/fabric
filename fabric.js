@@ -87,8 +87,8 @@ async function mergeIntent( intentObj ){
 
     // MESSAGE EXISTING OR SPAWN 
     var target_worker;
-    if( procs[ intentObj.uuid ] ){                      // EXISTING PROCESS OR SPAWN: 
-        target_worker = procs[ intentObj.uuid ].worker; // SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
+    if( procs[ intentObj.uuid ] ){                       // EXISTING PROCESS OR SPAWN: 
+        target_worker = procs[ intentObj.uuid ].worker;  // SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
         target_worker.postMessage( intentObj );
     }else{
         
@@ -111,11 +111,12 @@ async function mergeIntent( intentObj ){
         // let intentObjFused = { method:'init' , ...creds.keySelect(  'dom' , intentObj.brand )[0]   , ...px3 } 
         // remove internal credential provider for simplicity for now // creds are embedded outside 
         
-        let intentObjFused = { method:'init' , ...px3 } 
+        let intentObjFused = {  ...px3 , method:'init'} 
         procs[ intentObjFused.uuid ] = { worker:target_worker };  // INSERT PROCESS
 
         // 1ST MESSAGE   SENDS INIT 
         target_worker.postMessage( intentObjFused )
+        
         // 2ND MESSAGE   SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
             await util.sleep(1000);
