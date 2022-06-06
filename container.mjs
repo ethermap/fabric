@@ -16,8 +16,6 @@
 import * as entities from './entities.js'
 //import * as ccx  from './drivers/ccxt.browser.js'
 import * as util from './drivers/util.js'
-
-//import * as ccx  from '/drivers/ccxtesbuilt2.js'
                                                          
 
 console.log(' Process Container running  ')
@@ -141,13 +139,10 @@ async function init( obj ){
 }
 
 
-
-    //addEventListener('message', outboundMessage )
-
+//addEventListener('message', outboundMessage )
 // // CALLBACK REPEAT 
 // var intervalID = setInterval(myCallback, 3500, 'Parameter 1', 'Parameter 2');
 // async function myCallback(a, b)
 // {
-
-
 // }
+//import * as ccx  from '/drivers/ccxtesbuilt2.js'
