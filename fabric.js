@@ -18,6 +18,13 @@ var port1 = channel.port1;                // PORT
 var port2 = channel.port2;                // PORT
 var creds = false;                        // future cache ref 
                                           // should operate with pre injected creds 
+// var is_worker = ! document;
+// var scriptnode = document.createElement('script');
+// scriptnode.setAttribute('id','pchecker');
+// var script_path = is_worker ? null : (function() {
+// 	var id = '9998998';
+// 	return document.querySelector('#pchecker').previousSibling.src;
+// })();
 
 
 
@@ -94,7 +101,7 @@ async function mergeIntent( intentObj ){
         
         // CHECK IF WORKER.CLASSIC or WORKER.MODULE 
         const driver_conf = { type:'module' } // driver.includes('esm') ?  { type:'module'} : { type:'classic' }
-        const container_path = './container.mjs';
+        const container_path = '/fabric/container.mjs'; // workers dont use relative to page 
         var target_worker = new Worker( container_path , driver_conf );  // MUST USE ABSO PATH // pass { type:'module' } for es6 still buggy and bundled dependencies with node polyfils issues
         target_worker.addEventListener('message', messageFromWorker );        
         target_worker.addEventListener('onerror', messageFromWorker );      

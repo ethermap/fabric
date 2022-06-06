@@ -26,8 +26,8 @@ async function rawMaps(){
     return new Promise( ( resolve , reject )=>{
 
         var promise1 = fetchWrapped( "/data/demo/mega.json" )
-        var promise2 = fetchWrapped( "/data/demo/mega.json" )
-        var promise3 = fetchWrapped( "/data/demo/mega.json" )
+        var promise2 = fetchWrapped( "/data/demo/shiba.json" )
+        var promise3 = fetchWrapped( "/data/demo/shibb.json" )
         Promise.all([ promise1 , promise2 , promise3 ]).then( (values) => {
 
             resolve( values )
