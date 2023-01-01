@@ -5,9 +5,9 @@ Isolated process manager for [Service Workers](https://developer.mozilla.org/en-
 Install
 ```shell
 # USER INSTALL
-npm install https://github.com/psytron/fabric
+npm install https://github.com/ethermap/fabric
 # SUBMODULE INSTALL
-git submodule add git@github.com:psytron/fabric path/to/project
+git submodule add git@github.com:ethermap/fabric path/to/project
 ```
 
 Basic Usage: 
@@ -16,18 +16,16 @@ Basic Usage:
 // IMPORT 
 import fabric from './fabric' 
 
-// SUBSCRIBE EVENT LISTENERS
+// MERGE INTENTS ROUTED TO SERVICES
+fabric.mergeIntent(  { method:'authorize' , domain:'generic' } );
+
+// SUBSCRIBE GENERIC EVENT LISTENERS
 fabric.addEventListener( 'fabricEvent' , function( e ){
     let message = e.detail;
     message.uuid    // UUID OF ENTITY 
     message.method  // METHOD BEING CALLED 
     message.payload // COMPLETED SERVICE RESPONSE
-});
-
-// MERGE INTENTS ROUTED TO SERVICES
-fabric.mergeIntent(  { method:'fetchOrders' , domain:'ethereum' , symbol:'ETH/USD' } );
-fabric.mergeSequence( [ { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' }, 
-                        { method:'withdraw' , domain:'vilqs' , symbol:'BTC/USD' } ] );
+});                        
 ```
 
 ### Documentation
