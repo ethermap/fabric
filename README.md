@@ -16,8 +16,8 @@ Basic Usage:
 // IMPORT 
 import fabric from './fabric' 
 
-// MERGE INTENTS ROUTED TO SERVICES
-fabric.mergeIntent(  { method:'authorize' , domain:'generic' } );
+// MERGE INTENTS
+fabric.mergeIntent(  { module:'generic' , method:'authorize' } );
 
 // SUBSCRIBE GENERIC EVENT LISTENERS
 fabric.addEventListener( 'fabricEvent' , function( e ){
