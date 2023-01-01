@@ -89,7 +89,7 @@ async function errorFromWorker( e ){
 async function mergeIntent( intentObj ){
 
     // ENSURE UUID LINKAGE
-    if( ! ('uuid' in intentObj) ) intentObj.uuid = util.uuidv4()
+    if( ! ('uuid' in intentObj) ) intentObj.uuid = util.uuidv4() // OR HASH UUID FROM ATTRIBS
 
 
     // MESSAGE EXISTING OR SPAWN 

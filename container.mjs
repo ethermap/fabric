@@ -42,7 +42,7 @@ async function inboundMessage( e ) {
     
     // TODO: Filter incoming extensions double check here 
     // message enveloper decrypt then route 
-    var xclass = ('method' in e.data) ? e.data.method : ('fn' in e.data) ? e.data.fn : 'init';
+    var xmethod = ('method' in e.data) ? e.data.method : ('fn' in e.data) ? e.data.fn : 'init';
 
     
     // OUTBOUND CACHE BLAST 
@@ -55,17 +55,17 @@ async function inboundMessage( e ) {
         if( state.driver ){
             
             // CALL FOREIGN METHOD 
-            state.driver[ xclass ]( e.data )
+            state.driver[ xmethod ]( e.data )
             .then( function( returned_payload ){
                 var resObj = {}
-                resObj['method'] = xclass;
-                resObj['foreignMethod'] = xclass;
+                resObj['method'] = xmethod;
+                resObj['foreignMethod'] = xmethod;
                 resObj['uuid'] = e.data.uuid
                 resObj['payload'] = returned_payload
                 outboundMessage( resObj )    
             })
             .catch( err => {
-                console.log(' Container Foreign call error:  ', err )
+                console.log('Container: Foreign Call Error:  ', err )
             })            
         }else{
             // console.log( 'firing pre  init: ')            
@@ -74,8 +74,8 @@ async function inboundMessage( e ) {
         }
         
     } catch (err) {
-        console.log( xclass )
-        console.log(' err in ethers vehicle: ', err)
+        console.log(' Container Exception : ', err );
+        console.log('             xmethod : ', xmethod );
     }
 }
 // ALL OUTBOUND EVENTS ON NETWORK IO 
@@ -104,7 +104,7 @@ async function init( obj ){
     // util.elapsed() 
 
 
-    // SELECT DRIVER 
+    // SELECT DRIVER MODULE
     var driver;
     if( 'brand' in obj ){
         if( obj.brand in entities.nodes ){
@@ -114,7 +114,10 @@ async function init( obj ){
         }
     }else if( 'driver' in obj ){
         driver = obj.driver + '_esm.mjs'
-    }else{
+    }else if( 'module' in obj ){
+        driver = obj.module + '_esm.mjs'
+    }
+    else{
         driver = 'default_esm.mjs'
     }
     
