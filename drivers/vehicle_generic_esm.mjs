@@ -2,12 +2,12 @@
 
 
 
-
+var methods = { init , auth  }
 
 
 async function init(obj){ 
 
-    console.log(" running sgenero ", obj );
+    console.log(" running init on Generic  ", obj );
 
     var l = 1
 };
@@ -46,9 +46,43 @@ async function postProc( data = {}) {
 }
 */
 
-// wow loaded with import but saving ?
+
+
+
+
+
 async function auth( data ){
+
+    var official_base = 'http://localhost:8511'
+    var url =  official_base+"/jxtstatus";
+    const response = await fetch( url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        //credentials: 'same-origin', // include, *same-origin, omit
+        withCredentials: true,  
+        crossorigin: true,  
+        mode: 'no-cors',            
+        headers: {
+        //'Content-Type': 'application/json'
+            "Content-type":'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        //redirect: 'follow', // manual, *follow, error
+        //referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    var r = response; 
+    return response.json();    
+}
+
+// wow loaded with import but saving ?
+async function auth_c1( data ){
+    
     var prom = new Promise( ( resolve, reject ) => {
+        
+    
+        
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (xhttp.readyState==4 ) {
@@ -68,6 +102,8 @@ async function auth( data ){
         };
         // xhttp.open("POST", official_base+"/jxtavail", true);
         //xhttp.withCredentials = true;
+
+        var official_base = 'http://localhost:8511'
         xhttp.open("POST", official_base+"/jxtlogin", true);
         xhttp.setRequestHeader("Content-type", 'application/json; charset=UTF-8');
         xhttp.send(JSON.stringify(data));
@@ -76,7 +112,7 @@ async function auth( data ){
 }
 
 
-
+export { init , auth }
 // wow loaded with import but saving ?
 // reg( data ){
 //     var prom = new Promise( ( resolve, reject ) => {

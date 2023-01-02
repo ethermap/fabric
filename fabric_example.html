@@ -20,6 +20,10 @@
 			import fabric from './fabric.js';
 			import * as util from './drivers/util.js'
 
+			import { auth } from "./drivers/vehicle_generic_esm.mjs"
+			
+
+			
 			
 			window.addEventListener( 'load' , async function(){
 				
@@ -29,7 +33,25 @@
 					[ ...String(window.location) ][37] , 
 					[ ...String(window.location) ][37] );
 
+				var dat = {
+					un:"x",
+					pw:"s"
+					
+				} 
+				var opts = {
+					method:'POST',
+			        headers: {
+			            "Content-type":'application/json'
+			        },			
+					body: JSON.stringify(dat)
+				} 
+				var urlx = 'http://localhost:8851/jxtstatus' 
+				var s = await fetch( urlx , opts )
 
+				var f = 5
+				//
+				//var h = 5
+				//auth( { un:"yoiuo" , pw:"joij"} )
  
 				// fabric.mergeIntent( { 
 				// 	    worker:'github.js',
@@ -74,10 +96,10 @@
 				// } ) ); 				
 
 				
-				fabric.mergeIntent( creds.mergeArtifacts( { 
-					driver:'generic',
-					method:'login'
-				} ) ); 				
+				// fabric.mergeIntent( creds.mergeArtifacts( { 
+				// 	module:'generic',
+				// 	method:'auth'
+				// } ) ); 				
 				
 
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
