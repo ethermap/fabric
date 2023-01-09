@@ -60,7 +60,7 @@ function messageFromWorker( e ){
     // USE SELF REPORT EVENTS TO ADD SUCCESSFUL WORKERS METADATA 
     if( messageObject.method == 'report'){
         procs[ messageObject.uuid ]['wid'] = messageObject['worker_id'];
-        console.log('        report( ')
+        console.log('        report:| ')
         for( var p in procs ){
             console.log('              ', p , ' : ', procs[p] )
         }

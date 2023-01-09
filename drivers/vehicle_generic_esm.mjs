@@ -1,9 +1,7 @@
 
 
 
-
-var methods = { init , auth  }
-
+ 
 
 async function init(obj){ 
 
@@ -13,8 +11,6 @@ async function init(obj){
 };
 
 //import { official_base , session_fragment } from './util.js'
-
-
 /*
 async function postProc( data = {}) {
     console.log(' POST PROC ')
@@ -47,42 +43,74 @@ async function postProc( data = {}) {
 */
 
 
+async function call( path , dat ){
+    var window = globalThis;
+    var official_base = 'http://localhost:8851'
+    var urlx = official_base+'/'+path;
 
 
+  
+//    const enc = new TextEncoder();
+//    var encoded= enc.encode( dat['pw'] );    
+//    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+//    var r =  window.crypto.subtle.encrypt({ name:'AES-GCM',iv:iv },'keyzs',encoded);
 
 
-async function auth( data ){
-
-    var official_base = 'http://localhost:8511'
-    var url =  official_base+"/jxtstatus";
-    const response = await fetch( url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        //mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        //credentials: 'same-origin', // include, *same-origin, omit
-        withCredentials: true,  
-        crossorigin: true,  
-        mode: 'no-cors',            
+    
+    var opts = {
+        method:'POST',
         headers: {
-        //'Content-Type': 'application/json'
             "Content-type":'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        //redirect: 'follow', // manual, *follow, error
-        //referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
+        },			
+        body: JSON.stringify(dat)
+    } 
+    var res = await fetch(  urlx , opts  )
+    .then( function(response) {
+        if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        return response;
+    }).then(function(response) {
+        return response
+    }).catch(function(error) {
+        console.log(error);
+        return  { 
+            status:"ERR ",
+            error: error
+        }
     });
-    var r = response; 
-    return response.json();    
+
+    if( res.status == 200 ){
+        return res.json()
+    }else{
+        return res;    
+    }
 }
+    
+
+
+async function auth( dat ){
+
+    var res = await call( 'jxtlogin' , dat )
+    var l = 3;
+
+}
+
+
+async function reg( dat ){
+
+    var res = await call( 'jxtreg' , dat )
+    var l = 3;
+
+}
+
+
+
 
 // wow loaded with import but saving ?
 async function auth_c1( data ){
     
     var prom = new Promise( ( resolve, reject ) => {
-        
-    
-        
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (xhttp.readyState==4 ) {
@@ -100,8 +128,9 @@ async function auth_c1( data ){
                 //resolve( { error:true  , message:'Connection Error: T2' } );
             }
         };
+        
         // xhttp.open("POST", official_base+"/jxtavail", true);
-        //xhttp.withCredentials = true;
+        // xhttp.withCredentials = true;
 
         var official_base = 'http://localhost:8511'
         xhttp.open("POST", official_base+"/jxtlogin", true);
@@ -112,7 +141,7 @@ async function auth_c1( data ){
 }
 
 
-export { init , auth }
+export { init , auth , reg }
 // wow loaded with import but saving ?
 // reg( data ){
 //     var prom = new Promise( ( resolve, reject ) => {
