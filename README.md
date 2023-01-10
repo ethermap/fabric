@@ -44,6 +44,7 @@ var cv = await fabric.find("cloudvault")
 var acv = await cv.auth(pk,pk) 
 var pl = await 
 
+```javascript
 // sequence
 await ( f.curve ).auth( await f.find("vault") )
 // parallel 
@@ -51,7 +52,7 @@ await ( f.curve ).auth( await f.find("vault") )
 // path
 fab.gp( )
 //-> { meta:{} , nodes:[] , edges:[] }
-
+```
 
 ## Fabric 
 ![TFx](https://raw.githubusercontent.com/psytron/fabric/main/meta/tfx.jpg)
