@@ -51,17 +51,21 @@ async function inboundMessage( e ) {
     // WRAP EVERY MESSAGE INVOCATION TO PREVENT JANK UPSTREAM 
     try {
         // HOW DOES THE PROCESS CONTAINER GET SUPPORTED DRIVER METHODS ?
-        // CAN WE USE DRIVER EXPROTS TO BE STANDARD 
+        // CAN WE USE DRIVER.EXPROTS TO BE STANDARD 
         if( state.driver ){
             
             // CALL FOREIGN METHOD 
             state.driver[ xmethod ]( e.data )
             .then( function( returned_payload ){
                 var resObj = {}
+                resObj['module']=state.module;
                 resObj['method'] = xmethod;
                 resObj['foreignMethod'] = xmethod;
                 resObj['uuid'] = e.data.uuid
                 resObj['payload'] = returned_payload
+
+
+            
                 outboundMessage( resObj )    
             })
             .catch( err => {
@@ -82,6 +86,7 @@ async function inboundMessage( e ) {
 function outboundMessage( obj ){  
 
     var outboundObject = obj; 
+
     postMessage( outboundObject ); 
 }
 
@@ -112,10 +117,13 @@ async function init( obj ){
         }else{
             driver = 'ethers_esm.mjs'
         }
+        state.module=driver;
     }else if( 'driver' in obj ){
         driver = obj.driver + '_esm.mjs'
+        state.module=driver;
     }else if( 'module' in obj ){
         driver = obj.module + '_esm.mjs'
+        state.module=obj.module;
     }
     else{
         driver = 'default_esm.mjs'

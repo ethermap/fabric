@@ -40,6 +40,18 @@ Fabric enables parallel operations and aggregates the responses into a message b
 OCAP: [Ports as the basis of an object-capability model on the web](https://html.spec.whatwg.org/multipage/web-messaging.html#ports-as-the-basis-of-an-object-capability-model-on-the-web)
 
 
+var cv = await fabric.find("cloudvault")
+var acv = await cv.auth(pk,pk) 
+var pl = await 
+
+// sequence
+await ( f.curve ).auth( await f.find("vault") )
+// parallel 
+[ f.cue , f.auth ]
+// path
+fab.gp( )
+//-> { meta:{} , nodes:[] , edges:[] }
+
 
 ## Fabric 
 ![TFx](https://raw.githubusercontent.com/psytron/fabric/main/meta/tfx.jpg)

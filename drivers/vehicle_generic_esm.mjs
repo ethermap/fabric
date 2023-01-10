@@ -47,29 +47,23 @@ async function call( path , dat ){
     var window = globalThis;
     var official_base = 'http://localhost:8851'
     var urlx = official_base+'/'+path;
-
-
-  
 //    const enc = new TextEncoder();
 //    var encoded= enc.encode( dat['pw'] );    
 //    const iv = window.crypto.getRandomValues(new Uint8Array(12));
 //    var r =  window.crypto.subtle.encrypt({ name:'AES-GCM',iv:iv },'keyzs',encoded);
-
-
-    
-    var opts = {
+ 
+    var res = await fetch(  urlx , {
         method:'POST',
         headers: {
             "Content-type":'application/json'
         },			
         body: JSON.stringify(dat)
-    } 
-    var res = await fetch(  urlx , opts  )
+    })
     .then( function(response) {
         if (!response.ok) {
             throw Error(response.statusText);
         }
-        return response;
+        return response.json();
     }).then(function(response) {
         return response
     }).catch(function(error) {
@@ -92,56 +86,38 @@ async function call( path , dat ){
 async function auth( dat ){
 
     var res = await call( 'jxtlogin' , dat )
-    var l = 3;
+    return res;
 
 }
 
 
-async function reg( dat ){
+async function register( dat ){
 
     var res = await call( 'jxtreg' , dat )
-    var l = 3;
+    return res; 
 
 }
 
 
 
-
-// wow loaded with import but saving ?
-async function auth_c1( data ){
-    
-    var prom = new Promise( ( resolve, reject ) => {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (xhttp.readyState==4 ) {
-                if( xhttp.status == 200){
-                    var resObj = JSON.parse(xhttp.responseText);
-                    var outmessage =resObj.message;
-                    var jtkn = resObj.tkn
-                    resolve( resObj )
-
-                }else{
-                    resolve( { error:true , message:'Connection Error: T1' } );
-                } //window.location.replace('/');
-            }else{
-                console.log(' readyState not 4')
-                //resolve( { error:true  , message:'Connection Error: T2' } );
-            }
-        };
-        
-        // xhttp.open("POST", official_base+"/jxtavail", true);
-        // xhttp.withCredentials = true;
-
-        var official_base = 'http://localhost:8511'
-        xhttp.open("POST", official_base+"/jxtlogin", true);
-        xhttp.setRequestHeader("Content-type", 'application/json; charset=UTF-8');
-        xhttp.send(JSON.stringify(data));
-    });
-    return prom;
-}
+export { init , auth , register }
 
 
-export { init , auth , reg }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // wow loaded with import but saving ?
 // reg( data ){
 //     var prom = new Promise( ( resolve, reject ) => {
@@ -397,3 +373,39 @@ export { init , auth , reg }
 
 // }
 
+
+
+
+
+// wow loaded with import but saving ?
+// async function auth_c1( data ){
+    
+//     var prom = new Promise( ( resolve, reject ) => {
+//         var xhttp = new XMLHttpRequest();
+//         xhttp.onreadystatechange = function() {
+//             if (xhttp.readyState==4 ) {
+//                 if( xhttp.status == 200){
+//                     var resObj = JSON.parse(xhttp.responseText);
+//                     var outmessage =resObj.message;
+//                     var jtkn = resObj.tkn
+//                     resolve( resObj )
+
+//                 }else{
+//                     resolve( { error:true , message:'Connection Error: T1' } );
+//                 } //window.location.replace('/');
+//             }else{
+//                 console.log(' readyState not 4')
+//                 //resolve( { error:true  , message:'Connection Error: T2' } );
+//             }
+//         };
+        
+//         // xhttp.open("POST", official_base+"/jxtavail", true);
+//         // xhttp.withCredentials = true;
+
+//         var official_base = 'http://localhost:8511'
+//         xhttp.open("POST", official_base+"/jxtlogin", true);
+//         xhttp.setRequestHeader("Content-type", 'application/json; charset=UTF-8');
+//         xhttp.send(JSON.stringify(data));
+//     });
+//     return prom;
+// }
