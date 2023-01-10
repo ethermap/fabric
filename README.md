@@ -40,11 +40,12 @@ Fabric enables parallel operations and aggregates the responses into a message b
 OCAP: [Ports as the basis of an object-capability model on the web](https://html.spec.whatwg.org/multipage/web-messaging.html#ports-as-the-basis-of-an-object-capability-model-on-the-web)
 
 
+
+
+```javascript
 var cv = await fabric.find("cloudvault")
 var acv = await cv.auth(pk,pk) 
 var pl = await 
-
-```javascript
 // sequence
 await ( f.curve ).auth( await f.find("vault") )
 // parallel 
