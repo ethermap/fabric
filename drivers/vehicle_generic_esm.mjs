@@ -98,6 +98,24 @@ async function register( dat ){
 
 }
 
+    //// LOCAL STORAGE 
+function getLocal(){
+    var item =  localStorage.getItem('sm');
+    if( item ){
+        var obj= JSON.parse( item )
+        return obj;
+    }else{
+        return {};
+    }
+}
+
+function pushLocal( dom , obj ){
+    var item = this.getLocal()
+    var newlocal = { ...item , ...obj }   
+    localStorage.setItem( dom , JSON.stringify(obj) );
+    return newlocal;
+}
+
 
 
 export { init , auth , register }

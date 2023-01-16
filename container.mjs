@@ -12,28 +12,25 @@
 //  .|   --|  |  | | | | | | |     |-   -| | | |   __|    -|.  //
 //   |_____|_____|_|___| |_| |__|__|_____|_|___|_____|__|__|   //
 
-// import * as ccx  from './drivers/ccxtesbuilt.js'
+
 import * as entities from './entities.js'
-//import * as ccx  from './drivers/ccxt.browser.js'
 import * as util from './drivers/util.js'
                                                          
 
-console.log(' Process Container running  ')
-
 // PROCESS CONTAINER // STATE STRUCT 
 var state = {
+    uuid: false, 
+    driver: false ,
+    initObj:{}, 
     access_count: 0,   
     stack_trace_buffer:[] ,
-    uuid: false, 
     worker_id:'w'+ Math.round( Math.random()*99999 ), // UUID EXTRINSIC 
     op_tick:{  returned_scope_closure:0   },
     messageStruct: {
-        fn:'fetchTicker',
+        fn:'method',
         obj:{} , 
         domain:'initObj'
-    }, 
-    initObj:{}, 
-    driver: false 
+    }
 }
 
 
@@ -46,12 +43,14 @@ async function inboundMessage( e ) {
 
     
     // OUTBOUND CACHE BLAST 
+    // CACHE COULD ALSO BE AT DRIVER LEVEL 
+    // CACHE COULD ALSO FIRE AGAIN AFTER HARDLOAD
     // cacheBusPost( responseObj )
+    // ALSO CUE and SEQUENCE NUMBER to BROADCAST IN ORDER OF CALL 
     
     // WRAP EVERY MESSAGE INVOCATION TO PREVENT JANK UPSTREAM 
     try {
-        // HOW DOES THE PROCESS CONTAINER GET SUPPORTED DRIVER METHODS ?
-        // CAN WE USE DRIVER.EXPROTS TO BE STANDARD 
+        // HOW DOES THE PROCESS CONTAINER GET SUPPORTED DRIVER METHODS CAN WE USE DRIVER.EXPROTS TO BE STANDARD 
         if( state.driver ){
             
             // CALL FOREIGN METHOD 
@@ -64,8 +63,6 @@ async function inboundMessage( e ) {
                 resObj['uuid'] = e.data.uuid
                 resObj['payload'] = returned_payload
 
-
-            
                 outboundMessage( resObj )    
             })
             .catch( err => {
@@ -86,7 +83,6 @@ async function inboundMessage( e ) {
 function outboundMessage( obj ){  
 
     var outboundObject = obj; 
-
     postMessage( outboundObject ); 
 }
 
