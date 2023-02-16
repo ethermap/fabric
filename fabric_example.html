@@ -20,7 +20,7 @@
 			import fabric from './fabric.js';
 			import * as util from './drivers/util.js'
 
-			import { auth } from "./drivers/vehicle_generic_esm.mjs"
+			//import { auth } from "./drivers/vehicle_generic_esm.mjs"
 			
 
 			
@@ -33,7 +33,8 @@
 					[ ...String(window.location) ][37] , 
 					[ ...String(window.location) ][37] );
 
-
+				var ncr = creds.get('neo')
+				var k = 3;
 
 				//var f = 5
 				//var h = 5
@@ -80,24 +81,48 @@
 				// 	method:'rawMaps'
 				// } ) ); 				
 
-		
+
 				
-				fabric.mergeIntent( creds.mergeArtifacts( { 
-					uuid:'0x0x0x',
-					module:'generic',
-					method:'register',
-					un:'x@gmail.com',
-					ac:'liquid',
-					pw:'x'
-				}) ); 						
-
-
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
 			        var data=e.detail;
-					console.log('     onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
+					console.log('onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
+					console.log('|' )					
 			        var i=0;
+
+					if( data.method =='login'){
+						
+						fabric.mergeIntent( { 
+						 	uuid:'0x0x0x',
+							module:'generic',
+						 	method:'status'
+						} ); 		
+					}
 					
 			    })						
+		
+				// fabric.mergeIntent( creds.mergeArtifacts( { 
+				// 	uuid:'0x0x0x',
+				// 	module:'generic',
+				// 	method:'login',
+				// 	payload:{  },  
+				// 	un:'x@x.com',
+				// 	ac:'liquid',
+				// 	pw:'2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881' //x 
+				// })); 
+
+				var obj_N =  creds.mergeArtifacts( { 
+					brand:'neo',
+					module:'neo',
+					method:'query',
+					query:'(:Star)--(:Star)',
+					payload:{  }
+				});
+				
+				fabric.mergeIntent( obj_N); 				
+				//await util.sleep(3000);
+
+			
+				
 			});
 		</script>
 
@@ -176,7 +201,7 @@
 				// fabric.facilitate
 				// fabric.support( )
 				// fabric.mergeIntent( )
-				//await fabric.mergeIntent( creds.mergeCredential( { 
+				// await fabric.mergeIntent( creds.mergeCredential( { 
 				// await fabric.mergeIntent( { ...creds.keySelect( 'dom' )[0]  
 				// 		driver:'github_esm',	
 				// 		method:'smallList' } ) )

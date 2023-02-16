@@ -13,7 +13,6 @@
 //   |_____|_____|_|___| |_| |__|__|_____|_|___|_____|__|__|   //
 
 
-import * as entities from './entities.js'
 import * as util from './drivers/util.js'
                                                          
 
@@ -85,12 +84,10 @@ function outboundMessage( obj ){
     var outboundObject = obj; 
     postMessage( outboundObject ); 
 }
-
-
 // SUBSCRIBE INBOUND EVENTS
 addEventListener('message', inboundMessage );
 
-// SUBSCRIBE OUTBOUND EVENTS 
+ 
 async function init( obj ){
     
     // THIS SHOULD WORK  EMPTY , IT SOULD SHUT DOWNSTREAM//
@@ -106,17 +103,12 @@ async function init( obj ){
 
 
     // SELECT DRIVER MODULE
+    // ideally this would be working path 
+    // container simply proxies func calls as messages 
     var driver;
-    if( 'brand' in obj ){
-        if( obj.brand in entities.nodes ){
-            driver = 'ccxt_esm.mjs';     
-        }else{
-            driver = 'ethers_esm.mjs'
-        }
-        state.module=driver;
-    }else if( 'driver' in obj ){
+    if( 'driver' in obj ){
         driver = obj.driver + '_esm.mjs'
-        state.module=driver;
+        state.module=obj.module;
     }else if( 'module' in obj ){
         driver = obj.module + '_esm.mjs'
         state.module=obj.module;
@@ -152,4 +144,4 @@ async function init( obj ){
 // async function myCallback(a, b)
 // {
 // }
-//import * as ccx  from '/drivers/ccxtesbuilt2.js'
+ 

@@ -1,7 +1,7 @@
 
 
 
- 
+var tkn = false; 
 
 async function init(obj){ 
 
@@ -43,6 +43,8 @@ async function postProc( data = {}) {
 */
 
 
+
+
 async function call( path , dat ){
     var window = globalThis;
     var official_base = 'http://localhost:8851'
@@ -51,12 +53,15 @@ async function call( path , dat ){
 //    var encoded= enc.encode( dat['pw'] );    
 //    const iv = window.crypto.getRandomValues(new Uint8Array(12));
 //    var r =  window.crypto.subtle.encrypt({ name:'AES-GCM',iv:iv },'keyzs',encoded);
- 
+
+    var head = {
+        "Content-type":'application/json'
+    }    
+    
     var res = await fetch(  urlx , {
         method:'POST',
-        headers: {
-            "Content-type":'application/json'
-        },			
+        //credentials: 'include', // triggers cors
+        headers:head,			
         body: JSON.stringify(dat)
     })
     .then( function(response) {
@@ -70,7 +75,8 @@ async function call( path , dat ){
         console.log(error);
         return  { 
             status:"ERR ",
-            error: error
+            error: error,
+            message:'Connection Error'
         }
     });
 
@@ -80,22 +86,55 @@ async function call( path , dat ){
         return res;    
     }
 }
-    
 
+async function reset( dat ){
 
-async function auth( dat ){
-
-    var res = await call( 'jxtlogin' , dat )
+    var res = await call( 'jxtreset' , dat )
     return res;
 
 }
-
-
 async function register( dat ){
 
     var res = await call( 'jxtreg' , dat )
     return res; 
 
+}
+async function login( dat ){
+
+
+    var res = await call( 'jxtlogin' , dat )
+    if( res && 'tkn' in res ){
+        tkn=res['tkn']
+    }
+    return res;
+
+}
+async function logout( dat ){
+
+    var res = await call( 'jxtlogout' , dat )
+    return res;
+
+}
+async function status( dat ){
+
+
+    if( tkn ){
+        dat['tkn']=tkn;
+    }
+    var res = await call( 'jxtstatus' , dat )
+    return res;
+
+}
+
+
+
+// would this be easier than just method names based on calls: ? 
+async function sendOperation( dat ){ 
+
+    var meth = 'jxt'+dat.method; 
+    var res = await call( meth , dat )
+    return res; 
+    
 }
 
     //// LOCAL STORAGE 
@@ -108,7 +147,6 @@ function getLocal(){
         return {};
     }
 }
-
 function pushLocal( dom , obj ){
     var item = this.getLocal()
     var newlocal = { ...item , ...obj }   
@@ -118,7 +156,7 @@ function pushLocal( dom , obj ){
 
 
 
-export { init , auth , register }
+export { init , login , logout , reset , register , status , sendOperation }
 
 
 

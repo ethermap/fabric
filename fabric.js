@@ -110,7 +110,7 @@ async function mergeIntent( intentObj ){
         // STRUCTURED CLONE COMPATIBILITY STRIP REFS  //console.log(' merge Intent ', new Date().getTime() )    
         var px1 = { ...intentObj }                       //  "Spread"
         var px2 = Object.assign({}, intentObj )          //  "Object.assign"
-        var px3 = JSON.parse(JSON.stringify(intentObj))  //  "JSON"            
+        var px3 = JSON.parse(JSON.stringify( intentObj ))  //  "JSON"            
         // IN ABSENCE OF KEYSTORE and USE MANUALLY ADDED 
         // UNREGISTERED WORKER MUST FIRE INIT BEFORE FINAL ( init last to overwrite )
         // Here is UUID from Credential Provider supposed to overwrite the UUID set ? 
@@ -126,7 +126,7 @@ async function mergeIntent( intentObj ){
         
         // 2ND MESSAGE   SENDS ORIGINAL FIRST INTENT OBJECT 
         if( px3.method ){
-            await util.sleep(1000);
+            await util.sleep(1000); // THIS DELAY SHOULD BE CONDITIONAL 
             // EXPERIMENT WITH CUE FOR INIT AND SEQUENTIAL ORDERS 
             target_worker.postMessage( px3 )    
         }
@@ -161,7 +161,6 @@ function accessFrameByVector( x , y , z, s, t){
     // ACCESS CACHE AND RETURN SERIES 
     console.log(' frame fector ')
 }
-
 
 
 
