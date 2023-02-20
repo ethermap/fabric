@@ -53,6 +53,7 @@ async function query( dat ){
                 // REMAP NODE UUIDs 
                 recs.nodes = recs.nodes.map( function( element ){
                     element.uuid = element.elementId; 
+                    element.origin = 'neo';
                     return element
                 })
                 // REMAP EDGE UUIDs
@@ -61,6 +62,7 @@ async function query( dat ){
                     element.uuid = element.elementId; 
                     element.a = element.startNodeElementId;
                     element.b = element.endNodeElementId;
+                    element.origin = 'neo';
                     return element
                 })                
                 
@@ -80,7 +82,67 @@ async function query( dat ){
 
 }
 
+async function merge( dat ){
 
+    return new Promise(   ( resolve , reject )=>{
+
+        var element_id = dat.payload.uuid ;
+        var neo_id = element_id.split(':')[2];
+        
+        var query_base = 'MATCH (x) WHERE split(elementId(x), ":")[2] = "'+neo_id+'" ';
+        var query_middle = ''
+        delete dat.payload.uuid;
+        console.log('build update query ')
+        for (const [key, value] of Object.entries(dat.payload)) {
+            query_middle +='SET x.'+key+'="'+value+'" ';
+            console.log();
+        }
+
+        var qry = query_base+query_middle+"RETURN x"
+        
+        var qrggy = 'MATCH (x) \
+        WHERE split(elementId(x), ":")[2] = "955" \
+        SET x.birthdate = date("1980-01-01") \
+        RETURN x';
+
+        var recs = []
+        session.run( qry , {nameParam: 'Nones'}).then( result => {
+            result.records.forEach(record => {
+                var obj = record.toObject()['x']
+                
+                recs['meta']={ 'query':qry , channel:'neo' , name:'neo', response:'success '}
+                recs['nodes']=[obj];
+                recs['links']=[];
+                // map(function (element, index, array) { /* … */ }, thisArg)
+
+                // REMAP NODE UUIDs 
+                recs.nodes = recs.nodes.map( function( element ){
+                    element.uuid = element.elementId; 
+                    return element
+                })
+                // REMAP EDGE UUIDs
+                recs.links = recs.links.map( function( element ){
+                    
+                    element.uuid = element.elementId; 
+                    element.a = element.startNodeElementId;
+                    element.b = element.endNodeElementId;
+                    return element
+                })                
+                resolve( recs );
+            })
+        })
+        .catch(error => {
+            console.log(error)
+        })
+        .then(() => { 
+            console.log( recs )
+            session.close()
+            return recs;
+        })        
+
+    }) ; // promise 
+
+}
 
 // would this be easier than just method names based on calls: ? 
 async function sendOperation( dat ){ 
@@ -109,7 +171,7 @@ function pushLocal( dom , obj ){
     return newlocal;
 }
 
-export { init, query , sendOperation }
+export { init, query , merge , sendOperation }
 
 
 

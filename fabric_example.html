@@ -113,12 +113,12 @@
 				var obj_N =  creds.mergeArtifacts( { 
 					brand:'neo',
 					module:'neo',
-					method:'query',
+					method:'merge',
 					query:'(:Star)--(:Star)',
-					payload:{  }
+					payload:{ uuid:'4:18de4a64-650a-4f3d-9657-0526a5183d76:955' ,  a:'rtr' , b:'f4f4' }
 				});
 				
-				fabric.mergeIntent( obj_N); 				
+				fabric.mergeIntent( obj_N ); 				
 				//await util.sleep(3000);
 
 			
