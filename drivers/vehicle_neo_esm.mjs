@@ -31,13 +31,11 @@ async function query( dat ){
 
         var qry; 
         if( 'fragment' in dat ){
-            qry="MATCH g = "+dat.fragment + " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output"; 
+            qry="MATCH g = "+dat.fragment + " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output limit 1000"; 
         }else{
             qry= "match x return x ";//+ 
             //var qry = "MATCH g = ()-[]-()  RETURN {nodes: collect(nodes(g)), edges: collect(relationships(g))} as output"
             qry = "MATCH g = (:Star)-[:SHINES]-(:Star)  RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
-                               
-            
         }
 
         var recs = []

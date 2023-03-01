@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-		<title>Fabric Example</title>
+		<title>Origin Matrix</title>
 		<base href="" target="_blank">
         <meta charset="utf-8">
         <style>
@@ -13,13 +13,16 @@
     </head>
 
     <body> 
-		<div>SRVX FABRIC RUNNER</div>
+		<div style="font-size:160px; color:#99CCFF;">Org Mtrx</div>
         <script type="module">
 			
 			import KeyCache from '/keycache/keycache.js';
 			import fabric from './fabric.js';
 			import * as util from './drivers/util.js'
+			//import { auth } from "./drivers/vehicle_generic_esm.mjs"
+			import { OriginMatrix } from '/x_modules/frame/originmatrix.js'
 
+			var om = new OriginMatrix();
 			
 			window.addEventListener( 'load' , async function(){
 				
@@ -29,63 +32,35 @@
 					[ ...String(window.location) ][37] , 
 					[ ...String(window.location) ][37] );
 
+
+
+				
+
 				var ncr = creds.get('neo')
 				var k = 3;
-
-				//var f = 5
-				//var h = 5
-				//var v = await auth( { un:"yoiuo" , pw:"joij"} )
-				//var d=3
- 
-				// fabric.mergeIntent( { 
-				// 	    worker:'github.js',
-				// 		driver:'github_esm',	
-				// 		method:'smallList' } )			
-
-				// fabric.mergeIntent( { 
-				// 		driver:'github_esm',	
-				// 		method:'smallList' } )			
-
-				// fabric.mergeIntent( { 
-				// 		driver:'github_esm',	
-				//  		method:'smallList' } )			
-
-				// fabric.mergeIntent( { 
-				// 		driver:'github_esm',	
-				// 		method:'smallList' } )	
-
-				// fabric.mergeIntent( { 
-				// 		driver:'extractor_esm', 
-				// 		method:'rawMaps', 
-				// 		uuid:'220x1c2c2cdd22', 
-				// 		symbol:'SHIB'     } )		
-				
-				// fabric.mergeIntent( { 
-				// 		brand:'ethereum', 
-				// 		method:'pricedBalance', 
-				// 		uuid:'0x1wwwwc2c2cdd22', 
-				// 		symbol:'SHIB'     } )
-
-				// fabric.mergeIntent( mergeArtifacts( { 
-				// 	 brand:'coinbasepro'  , 
-				// 	 method:'pricedBalances', 
-				// 	 uuid:'0x1c2c2c22' 
-				// } ) );				
-
-				// fabric.mergeIntent( creds.mergeArtifacts( { 
-				// 	driver:'extractor',
-				// 	method:'rawMaps'
-				// } ) ); 				
-
 
 				
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
 			        var data=e.detail;
-					console.log('onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
+					console.log('onFabricEvent: ',e.deetail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
 					console.log('|' )					
 			        var i=0;
 
+					// will there ever be a situation where nodes of different types are added ? 
 
+
+					//  Add Key from KeyCache
+					//  Add MAP from KeyCache
+					//  Add list from NEO4J 
+					//  Add All Artifacts from keyCache  safely 
+					//  Add git-Repos from GIT list 
+					//  
+
+					om.wrapMergeNodes( e.detail.payload.nodes , 'neo' , 'elementId')
+					om.printInventory();				
+
+					
+					
 					if( data.method =='login'){
 						
 						fabric.mergeIntent( { 
