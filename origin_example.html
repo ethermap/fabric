@@ -39,57 +39,80 @@
 				var ncr = creds.get('neo')
 				var k = 3;
 
-				
+				var followed_up = false;
 			    fabric.addEventListener( 'fabricEvent' , function( e ){
 			        var data=e.detail;
-					console.log('onFabricEvent: ',e.deetail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
-					console.log('|' )					
+					console.log('onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
+					console.log('|' )			
 			        var i=0;
 
 					// will there ever be a situation where nodes of different types are added ? 
-
-
 					//  Add Key from KeyCache
 					//  Add MAP from KeyCache
 					//  Add list from NEO4J 
 					//  Add All Artifacts from keyCache  safely 
 					//  Add git-Repos from GIT list 
-					//  
-
-					om.wrapMergeNodes( e.detail.payload.nodes , 'neo' , 'elementId')
-					om.printInventory();				
-
-					
-					
-					if( data.method =='login'){
-						
-						fabric.mergeIntent( { 
-						 	uuid:'0x0x0x',
-							module:'generic',
-						 	method:'status'
-						} ); 		
+	
+					var test_map = {
+						nodes:[
+							{
+								nid:0,
+								title:'zero'
+							
+							},
+							{
+								nid:1,
+								title:'one'
+							}
+						],
+						links:[
+							{
+								nid:99,
+								nidStart:0,
+								nidEnd:1
+							}
+						],
+						meta:{
+							origin:'test',
+							foreign_id:'nid',
+							foreign_a:'nidStart',
+							foreign_b:'nidEnd'
+						}
 					}
+					om.mergeMap( test_map );
+					om.mergeMap( e.detail.payload )
+									
+
+					
+					if ( ! followed_up ){ 
+						fabric.mergeIntent( { 
+							uuid:'neo_origin_test',
+							brand:'neo',
+							module:'neo',
+							method:'query',
+							pattern:'()--(:Satellite)',
+							payload:{ uuid:'4:18de4a64-650a-4f3d-9657-0526a5183d76:955' ,  a:'rtr' , b:'f4f4' }
+						} ); 		
+						
+						followed_up=true;
+					}else{
+						om.printInventory();
+					}
+					
+
 					
 			    })						
 		
-				// fabric.mergeIntent( creds.mergeArtifacts( { 
-				// 	uuid:'0x0x0x',
-				// 	module:'generic',
-				// 	method:'login',
-				// 	payload:{  },  
-				// 	un:'x@x.com',
-				// 	ac:'liquid',
-				// 	pw:'2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881' //x 
-				// })); 
-
 				var obj_N =  creds.mergeArtifacts( { 
+					uuid:'neo_origin_test',
 					brand:'neo',
 					module:'neo',
-					method:'merge',
-					query:'(:Star)--(:Star)',
+					method:'query',
+					pattern:'(:Star)--(:Moon)',
 					payload:{ uuid:'4:18de4a64-650a-4f3d-9657-0526a5183d76:955' ,  a:'rtr' , b:'f4f4' }
 				});
 				
+				obj_N.uuid = 'neo_origin_test'; // this is override hack cause  merge Artifacts is clobbering uuid 
 				fabric.mergeIntent( obj_N ); 				
 				//await util.sleep(3000);
 

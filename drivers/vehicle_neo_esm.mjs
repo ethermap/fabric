@@ -30,10 +30,10 @@ async function query( dat ){
 
 
         var qry; 
-        if( 'fragment' in dat ){
-            qry="MATCH g = "+dat.fragment + " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output limit 1000"; 
+        if( 'pattern' in dat ){
+            qry = "MATCH g = "+dat.pattern + " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output limit 1000"; 
         }else{
-            qry= "match x return x ";//+ 
+            qry = "match x return x ";//+ 
             //var qry = "MATCH g = ()-[]-()  RETURN {nodes: collect(nodes(g)), edges: collect(relationships(g))} as output"
             qry = "MATCH g = (:Star)-[:SHINES]-(:Star)  RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
         }
@@ -44,7 +44,14 @@ async function query( dat ){
                 console.log(record)
                 var obj = record.toObject()
                 recs= obj['output'];
-                recs['meta']={ 'query':qry , channel:'neo' , name:'neo','response':'success '}
+                recs['meta']={ 
+                    query:qry , 
+                    channel:'neo' , 
+                    origin:'neo' , 
+                    foreign_id:'elementId', 
+                    foreign_a:'startNodeElementId',
+                    foreign_b:'endNodeElementId',
+                    response:'success '}
 
                 //    map(function (element, index, array) { /* … */ }, thisArg)
 
@@ -56,7 +63,6 @@ async function query( dat ){
                 })
                 // REMAP EDGE UUIDs
                 recs.links = recs.links.map( function( element ){
-                    
                     element.uuid = element.elementId; 
                     element.a = element.startNodeElementId;
                     element.b = element.endNodeElementId;
@@ -72,7 +78,7 @@ async function query( dat ){
         })
         .then(() => { 
             console.log( recs )
-            session.close()
+            //session.close()
             return recs;
         })        
 
