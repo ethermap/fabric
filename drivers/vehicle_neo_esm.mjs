@@ -14,8 +14,8 @@ var resset=[];
 
 
 async function init(obj){ 
-
     testdb = obj.url;
+    //testdb = 'bolt://localhost:7687';
     testun = obj.ke;
     testpw = obj.se;
     driver = neo4j.driver(testdb, neo4j.auth.basic( testun, testpw ) , { disableLosslessIntegers: true } );    
@@ -27,7 +27,6 @@ async function init(obj){
 async function query( dat ){
 
     return new Promise(   ( resolve , reject )=>{
-
 
         var qry; 
         if( 'pattern' in dat ){
@@ -53,14 +52,14 @@ async function query( dat ){
                     foreign_b:'endNodeElementId',
                     response:'success '}
 
-                //    map(function (element, index, array) { /* … */ }, thisArg)
+                // Map(function (element, index, array) { /* … */ }, thisArg)
 
                 // REMAP NODE UUIDs 
                 recs.nodes = recs.nodes.map( function( element ){
                     element.uuid = element.elementId; 
                     element.origin = 'neo';
                     return element
-                })
+                });
                 // REMAP EDGE UUIDs
                 recs.links = recs.links.map( function( element ){
                     element.uuid = element.elementId; 
@@ -68,8 +67,7 @@ async function query( dat ){
                     element.b = element.endNodeElementId;
                     element.origin = 'neo';
                     return element
-                })                
-                
+                });
                 resolve( recs );
             })
         })
@@ -81,10 +79,9 @@ async function query( dat ){
             //session.close()
             return recs;
         })        
-
     })
-
 }
+
 
 async function merge( dat ){
 
@@ -126,7 +123,6 @@ async function merge( dat ){
                 })
                 // REMAP EDGE UUIDs
                 recs.links = recs.links.map( function( element ){
-                    
                     element.uuid = element.elementId; 
                     element.a = element.startNodeElementId;
                     element.b = element.endNodeElementId;
@@ -143,10 +139,10 @@ async function merge( dat ){
             session.close()
             return recs;
         })        
-
     }) ; // promise 
-
 }
+
+
 
 // would this be easier than just method names based on calls: ? 
 async function sendOperation( dat ){ 
@@ -155,6 +151,15 @@ async function sendOperation( dat ){
     var res = await call( meth , dat )
     return res; 
     
+}
+
+function buildTestDetabases(  ){
+    var queries = [
+        'MERGE ( x :Satellite { name:"Apollo" } )-[ :ORBITS ]->( y :Planet { name:"Jupiter" })  RETURN x',
+        'MERGE ( x :Satellite { name:"Voyage" } )-[ :ORBITS ]->( y :Planet { name:"Jupiter" })  RETURN x',
+        'RETURN'
+    ]
+    console.log(' DB CREATE ');
 }
 
     //// LOCAL STORAGE 
@@ -176,6 +181,3 @@ function pushLocal( dom , obj ){
 }
 
 export { init, query , merge , sendOperation }
-
-
-
