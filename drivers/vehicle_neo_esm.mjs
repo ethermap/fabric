@@ -34,7 +34,7 @@ async function query( dat ){
         }else{
             qry = "match x return x ";//+ 
             //var qry = "MATCH g = ()-[]-()  RETURN {nodes: collect(nodes(g)), edges: collect(relationships(g))} as output"
-            qry = "MATCH g = (:Star)-[:SHINES]-(:Star)  RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
+            qry = "MATCH g = (:Star)-[:SHINES]-(:Star) RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
         }
 
         var recs = []
@@ -50,10 +50,88 @@ async function query( dat ){
                     foreign_id:'elementId', 
                     foreign_a:'startNodeElementId',
                     foreign_b:'endNodeElementId',
-                    response:'success '}
+                    response:'success'}
 
                 // Map(function (element, index, array) { /* … */ }, thisArg)
+                // REMAP NODE UUIDs 
+                recs.nodes = recs.nodes.map( function( element ){
+                    element.uuid = element.elementId; 
+                    element.origin = 'neo';
+                    return element
+                });
+                // REMAP EDGE UUIDs
+                recs.links = recs.links.map( function( element ){
+                    element.uuid = element.elementId; 
+                    element.a = element.startNodeElementId;
+                    element.b = element.endNodeElementId;
+                    element.origin = 'neo';
+                    return element
+                });
+                resolve( recs );
+            })
+        })
+        .catch(error => {
+            console.log(error)
+        })
+        .then(() => { 
+            console.log( recs )
+            //session.close()
+            return recs;
+        })        
+    })
+}
 
+var working_entry_query=` MATCH (p)
+WHERE ID(p) = 216
+CALL apoc.path.spanningTree(p, {
+    relationshipFilter: "KNOWS",
+    relationshipFilter: "FOLLOWS>|KNOWS",    
+	labelFilter: "+Engineering",
+    labelFilter: "/Engineering",    
+    minLevel: 1,
+    maxLevel: 3
+})
+YIELD path as g
+RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output;`
+
+
+
+async function entry( dat ){
+
+    return new Promise(   ( resolve , reject )=>{
+
+        var node_id = dat.uuid ;
+        var id_seg_1 = 'MATCH (p) WHERE ID(p) = 2111116';
+        var tree_seg_2 = 'CALL apoc.path.spanningTree(p, { minLevel: 1, maxLevel: 3 }) YIELD path as g'; 
+        var convert_seg_3 = 'RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output;'
+
+        var qry = id_seg_1 + tree_seg_2 + convert_seg_3;
+
+        var qry; 
+        if( 'pattern' in dat ){
+            qry = "MATCH g = "+dat.pattern + " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output limit 1000"; 
+        }else{
+            qry = "match x return x ";//+ 
+            //var qry = "MATCH g = ()-[]-()  RETURN {nodes: collect(nodes(g)), edges: collect(relationships(g))} as output"
+            qry = "MATCH g = (:Star)-[:SHINES]-(:Star) RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
+        }
+
+        var recs = []
+        session.run( qry , {nameParam: 'Nones'}).then( result => {
+            result.records.forEach(record => {
+                console.log(record)
+                var obj = record.toObject()
+                recs= obj['output'];
+                recs['meta']={ 
+                    query:qry , 
+                    channel:'neo' , 
+                    origin:'neo' , 
+                    foreign_id:'elementId', 
+                    foreign_a:'startNodeElementId',
+                    foreign_b:'endNodeElementId',
+                    response:'success'}
+
+                // Map(function (element, index, array) { /* … */ }, thisArg)
                 // REMAP NODE UUIDs 
                 recs.nodes = recs.nodes.map( function( element ){
                     element.uuid = element.elementId; 
@@ -144,6 +222,81 @@ async function merge( dat ){
 
 
 
+async function process( objIn ){
+
+    return new Promise(   ( resolve , reject )=>{
+
+        var payload = objIn.payload;
+        var proc;
+        var qry; 
+        
+        if( payload.identifier ){
+
+            var id_seg_1 = 'MATCH (p) WHERE ELEMENTID(p) = "'+payload.identifier+'" ';
+            var tree_seg_2 = 'CALL apoc.path.spanningTree(p, { minLevel: 1, maxLevel: 1 }) YIELD path as g '; 
+            var convert_seg_3 = 'RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output '
+            qry = id_seg_1 + tree_seg_2 + convert_seg_3;
+            
+        }else if( payload.pattern ){
+            
+            var pat_seq_1 = "MATCH g = "+payload.pattern+' ';
+            var convert_seq = " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output "; 
+            qry = pat_seq_1 + convert_seq; 
+            
+        }else{
+            
+            qry = "match x return x ";//+ 
+            //var qry = "MATCH g = ()-[]-()  RETURN {nodes: collect(nodes(g)), edges: collect(relationships(g))} as output"
+            qry = "MATCH g = (:Star)-[:SHINES]-(:Star) RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
+        }
+
+        var recs = []
+        session.run( qry , {nameParam: 'Nones'}).then( result => {
+            result.records.forEach(record => {
+                console.log(record)
+                var obj = record.toObject()
+                recs= obj['output'];
+                recs['meta']={ 
+                    query:qry , 
+                    channel:'neo' , 
+                    origin:'neo' , 
+                    foreign_id:'elementId', 
+                    foreign_a:'startNodeElementId',
+                    foreign_b:'endNodeElementId',
+                    response:'success'}
+
+                // Map(function (element, index, array) { /* … */ }, thisArg)
+                // REMAP NODE UUIDs 
+                recs.nodes = recs.nodes.map( function( element ){
+                    element.uuid = element.elementId; 
+                    element.origin = 'neo';
+                    element.label = element.labels[0];
+                    return element
+                });
+                // REMAP EDGE UUIDs
+                recs.links = recs.links.map( function( element ){
+                    element.uuid = element.elementId; 
+                    element.a = element.startNodeElementId;
+                    element.b = element.endNodeElementId;
+                    element.origin = 'neo';
+                    return element
+                });
+                resolve( recs );
+            })
+        })
+        .catch(error => {
+            console.log(error)
+        })
+        .then(() => { 
+            console.log( recs )
+            //session.close()
+            return recs;
+        })        
+    })
+}
+
+
+
 // would this be easier than just method names based on calls: ? 
 async function sendOperation( dat ){ 
 
@@ -180,4 +333,4 @@ function pushLocal( dom , obj ){
     return newlocal;
 }
 
-export { init, query , merge , sendOperation }
+export { init, query , merge , process ,  sendOperation }

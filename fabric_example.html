@@ -107,15 +107,41 @@
 				// 	pw:'2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881' //x 
 				// })); 
 
-				var obj_N =  creds.mergeArtifacts( { 
+				var reqObj1 = {
+					module:'neo',
+					method:'process',
+					payload:{
+						pattern:'(:Actor)--(:Movie)'
+					}
+				}
+				var reqObj2 = {
+					module:'neo',
+					method:'process',
+					payload:{
+						identifier:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746' 
+					}
+				}				
+
+				
+				var requestObject = { 
 					brand:'neo',
 					module:'neo',
-					method:'merge',
-					query:'(:Star)--(:Star)',
+					method:'query',
+					pattern:'(:Actor)--(:Movie)',
 					payload:{ uuid:'4:18de4a64-650a-4f3d-9657-0526a5183d76:955' ,  a:'rtr' , b:'f4f4' }
-				});
+				}
+
+				var requestObject = { 
+					brand:'neo',
+					module:'neo',
+					method:'entry',
+					elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:8746'
+				}				
 				
-				fabric.mergeIntent( obj_N ); 				
+				var obj_N =  creds.mergeArtifacts( reqObj1 );
+				var obj_M =  creds.mergeArtifacts( reqObj2 );
+				
+				fabric.mergeIntent( obj_M ); 				
 				//await util.sleep(3000);
 
 			
