@@ -122,6 +122,23 @@
 					}
 				}				
 
+				var reqObj3 = {
+					module:'neo',
+					method:'process',
+					payload:{
+						object:{ 
+							elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746' ,
+							labels:['Blok'],
+							properties:{
+								domain:'omfp',
+								width:'utaaa',
+								color:'penk'
+							}
+						}
+					}
+				}				
+				
+
 				
 				var requestObject = { 
 					brand:'neo',
@@ -139,7 +156,7 @@
 				}				
 				
 				var obj_N =  creds.mergeArtifacts( reqObj1 );
-				var obj_M =  creds.mergeArtifacts( reqObj2 );
+				var obj_M =  creds.mergeArtifacts( reqObj3 );
 				
 				fabric.mergeIntent( obj_M ); 				
 				//await util.sleep(3000);

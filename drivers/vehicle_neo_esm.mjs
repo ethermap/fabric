@@ -165,24 +165,20 @@ async function merge( dat ){
 
     return new Promise(   ( resolve , reject )=>{
 
-        var element_id = dat.payload.uuid ;
-        var neo_id = element_id.split(':')[2];
-        
-        var query_base = 'MATCH (x) WHERE split(elementId(x), ":")[2] = "'+neo_id+'" ';
+        var element_id = dat.object.elementId ;
+        var node_obj = dat.object;
+
+        var query_base = ' MATCH (x) WHERE ELEMENTID(x) = "'+element_id+'" '; 
         var query_middle = ''
-        delete dat.payload.uuid;
-        console.log('build update query ')
-        for (const [key, value] of Object.entries(dat.payload)) {
+
+        for (const [key, value] of Object.entries(node_obj.properties)) {
             query_middle +='SET x.'+key+'="'+value+'" ';
             console.log();
         }
 
         var qry = query_base+query_middle+"RETURN x"
         
-        var qrggy = 'MATCH (x) \
-        WHERE split(elementId(x), ":")[2] = "955" \
-        SET x.birthdate = date("1980-01-01") \
-        RETURN x';
+ 
 
         var recs = []
         session.run( qry , {nameParam: 'Nones'}).then( result => {
@@ -226,26 +222,58 @@ async function process( objIn ){
 
     return new Promise(   ( resolve , reject )=>{
 
-        var payload = objIn.payload;
+        var params = objIn.params;
         var proc;
         var qry; 
         
-        if( payload.identifier ){
+        if( params.identifier ){
 
-            var id_seg_1 = 'MATCH (p) WHERE ELEMENTID(p) = "'+payload.identifier+'" ';
+            var id_seg_1 = 'MATCH (p) WHERE ELEMENTID(p) = "'+params.identifier+'" ';
             var tree_seg_2 = 'CALL apoc.path.spanningTree(p, { minLevel: 1, maxLevel: 1, limit:50 }) YIELD path as g '; 
             var convert_seg_3 = 'RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output '
             qry = id_seg_1 + tree_seg_2 + convert_seg_3;
             
-        }else if( payload.pattern ){
+        }else if( params.pattern ){
             
             var pat_seq_1 = "MATCH g = "+payload.pattern+' ';
             var convert_seq = " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output "; 
             qry = pat_seq_1 + convert_seq; 
             
-        }else{
+        }else if( params.object ){
+
             
-            qry = "match x return x ";//+ 
+            var element_id = params.object.elementId ;
+            var node_obj = params.object;
+
+            var label = ( node_obj.labels ) ? node_obj.labels[0] : node_obj.label;
+            // UPDATE 
+            var query_base = ' MATCH (x) WHERE ELEMENTID(x) = "'+element_id+'" '; 
+            var query_middle = ''
+            var query_middle_kv = ' {'
+            for (const [key, value] of Object.entries(node_obj.properties)) {
+                query_middle +='SET x.'+key+'="'+value+'" ';
+
+                query_middle_kv +=' '+key+':"'+value+'" ,';
+                console.log();
+            }
+            query_middle_kv += ' }'
+            qry = query_base+query_middle+"RETURN x"
+            
+            var ob = node_obj.properties;
+
+            const jsonPropString = JSON.stringify(ob, null, 2).replace(/"(\w+)"\s*:/g, '$1:');    
+            // MERGE 
+            query_base = 'merge (x  :'+label+' '+jsonPropString+'  ) return x ';
+            var ff =55;
+
+            qry = query_base ;
+            
+            
+
+        }
+        else{
+            
+            qry = "match x return x ";
             //var qry = "MATCH g = ()-[]-()  RETURN {nodes: collect(nodes(g)), edges: collect(relationships(g))} as output"
             qry = "MATCH g = (:Star)-[:SHINES]-(:Star) RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
         }
@@ -255,33 +283,40 @@ async function process( objIn ){
             result.records.forEach(record => {
                 console.log(record)
                 var obj = record.toObject()
-                recs= obj['output'];
-                recs['meta']={ 
-                    query:qry , 
-                    channel:'neo' , 
-                    origin:'neo' , 
-                    foreign_id:'elementId', 
-                    foreign_a:'startNodeElementId',
-                    foreign_b:'endNodeElementId',
-                    response:'success'}
-
-                // Map(function (element, index, array) { /* … */ }, thisArg)
-                // REMAP NODE UUIDs 
-                recs.nodes = recs.nodes.map( function( element ){
-                    element.uuid = element.elementId; 
-                    element.origin = 'neo';
-                    element.label = element.labels[0];
-                    return element
-                });
-                // REMAP EDGE UUIDs
-                recs.links = recs.links.map( function( element ){
-                    element.uuid = element.elementId; 
-                    element.a = element.startNodeElementId;
-                    element.b = element.endNodeElementId;
-                    element.origin = 'neo';
-                    return element
-                });
-                resolve( recs );
+                
+                if( obj.x ){
+                    resolve( { nodes:[obj.x] , links:[] , meta:{} } );
+                }else{
+                    recs= obj['output'];
+                    recs['meta']={ 
+                        query:qry , 
+                        channel:'neo' , 
+                        origin:'neo' , 
+                        foreign_id:'elementId', 
+                        foreign_a:'startNodeElementId',
+                        foreign_b:'endNodeElementId',
+                        response:'success'}
+    
+                    // Map(function (element, index, array) { /* … */ }, thisArg)
+                    
+                    // REMAP NODE UUIDs 
+                    recs.nodes = recs.nodes.map( function( element ){
+                        element.uuid = element.elementId; 
+                        element.origin = 'neo';
+                        element.label = element.labels[0];
+                        return element
+                    });
+                    
+                    // REMAP EDGE UUIDs
+                    recs.links = recs.links.map( function( element ){
+                        element.uuid = element.elementId; 
+                        element.a = element.startNodeElementId;
+                        element.b = element.endNodeElementId;
+                        element.origin = 'neo';
+                        return element
+                    });
+                    resolve( recs );                    
+                }
             })
         })
         .catch(error => {
