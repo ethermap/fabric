@@ -271,6 +271,24 @@ async function process( objIn ){
             
 
         }
+        else if( params.link ){
+
+            var obj = params.link;
+            var startElementId = obj.startElementId;
+            var endElementId = obj.startElementId;
+            var label = ( obj.labels ) ? obj.labels[0] : obj.label;
+            
+            var query_start = ' MATCH (x) WHERE ELEMENTID(x) = "'+startElementId+'" '; 
+            var query_end =  ' MATCH (y) WHERE ELEMENTID(y) = "'+endElementId+'" '; 
+            
+            var propStr = JSON.stringify( obj.properties , null, 2).replace(/"(\w+)"\s*:/g, '$1:');    
+            var query_merge = ' MERGE (x)-[ r :'+label+' '+  propStr   +']-(y)';
+            var query_return =' RETURN x,r,y';
+            var fin = query_start+query_end+query_merge+query_return;
+
+            qry = fin;
+
+        }            
         else{
             
             qry = "match x return x ";

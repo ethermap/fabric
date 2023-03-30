@@ -117,7 +117,7 @@
 				var reqObj2 = {
 					module:'neo',
 					method:'process',
-					payload:{
+					params:{
 						identifier:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746' 
 					}
 				}				
@@ -125,7 +125,7 @@
 				var reqObj3 = {
 					module:'neo',
 					method:'process',
-					payload:{
+					params:{
 						object:{ 
 							elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746' ,
 							labels:['Blok'],
@@ -136,8 +136,52 @@
 							}
 						}
 					}
+				}		
+
+				var reqObj4 = {
+					module:'neo',
+					method:'process',
+					params:{
+						link:{ 
+							startElementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746',
+							endElementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:33892',
+							labels:['CONNECTS'],
+							properties:{
+								len:99,
+								vou:'noin'
+							}
+						}
+					}
+				}						
+
+				var reqObj5 = {
+					module:'neo',
+					method:'process',
+					params:{
+						nodes:[
+							{
+								elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746' ,
+								labels:['Blok'],
+								properties:{
+									domain:'omfp',
+									width:'utaaa',
+									color:'penk'
+								}
+							}
+						],
+						links:[
+							{
+								startElementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746',
+								endElementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:33892',
+								labels:['CONNECTS'],
+								properties:{
+									len:99
+								}
+							}
+						]
+					}
 				}				
-				
+								
 
 				
 				var requestObject = { 
@@ -155,8 +199,8 @@
 					elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:8746'
 				}				
 				
-				var obj_N =  creds.mergeArtifacts( reqObj1 );
-				var obj_M =  creds.mergeArtifacts( reqObj3 );
+				
+				var obj_M =  creds.mergeArtifacts( reqObj4 );
 				
 				fabric.mergeIntent( obj_M ); 				
 				//await util.sleep(3000);
