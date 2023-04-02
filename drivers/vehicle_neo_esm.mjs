@@ -296,6 +296,7 @@ async function process( objIn ){
             qry = "MATCH g = (:Star)-[:SHINES]-(:Star) RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output";
         }
 
+        // split f
         var recs = []
         session.run( qry , {nameParam: 'Nones'}).then( result => {
             result.records.forEach(record => {
