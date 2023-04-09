@@ -197,10 +197,26 @@
 					module:'neo',
 					method:'entry',
 					elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:8746'
-				}				
+				}		
+
+				var reqObj6 = {
+					module:'neo',
+					method:'process',
+					params:{
+						link:{ 
+							startElementId:"4:f1731dc5-74ac-401d-9312-d6481729f6fb:33935",
+							endElementId:"4:f1731dc5-74ac-401d-9312-d6481729f6fb:33934",
+							type:'CONNECTS',
+							properties:{
+								weight:0,
+								uuid:"795e1a9d-96d1-4d5a-8f99-9ef9b21dc243"
+							}
+						}
+					}
+				}					
+
 				
-				
-				var obj_M =  creds.mergeArtifacts( reqObj4 );
+				var obj_M =  creds.mergeArtifacts( reqObj6 );
 				
 				fabric.mergeIntent( obj_M ); 				
 				//await util.sleep(3000);

@@ -15,9 +15,12 @@ var resset=[];
 
 async function init(obj){ 
     testdb = obj.url;
-    //testdb = 'bolt://localhost:7687';
     testun = obj.ke;
     testpw = obj.se;
+
+    // LOCAL DEV OVERRIDE 
+    testdb = 'bolt://localhost:7687';  testun = 'neo4j';  testpw ='';
+    
     driver = neo4j.driver(testdb, neo4j.auth.basic( testun, testpw ) , { disableLosslessIntegers: true } );    
     session = driver.session();
     var l = 1
@@ -275,14 +278,14 @@ async function process( objIn ){
 
             var obj = params.link;
             var startElementId = obj.startElementId;
-            var endElementId = obj.startElementId;
-            var label = ( obj.labels ) ? obj.labels[0] : obj.label;
+            var endElementId = obj.endElementId;
+            var type = obj.type;
             
             var query_start = ' MATCH (x) WHERE ELEMENTID(x) = "'+startElementId+'" '; 
             var query_end =  ' MATCH (y) WHERE ELEMENTID(y) = "'+endElementId+'" '; 
             
             var propStr = JSON.stringify( obj.properties , null, 2).replace(/"(\w+)"\s*:/g, '$1:');    
-            var query_merge = ' MERGE (x)-[ r :'+label+' '+  propStr   +']-(y)';
+            var query_merge = ' MERGE (x)-[ r :'+type+' '+  propStr   +']-(y)';
             var query_return =' RETURN x,r,y';
             var fin = query_start+query_end+query_merge+query_return;
 
@@ -297,44 +300,48 @@ async function process( objIn ){
         }
 
         // split f
+        var neo_meta={ 
+            query:qry , 
+            channel:'neo' , 
+            origin:'neo' , 
+            foreign_id:'elementId', 
+            foreign_a:'startNodeElementId',
+            foreign_b:'endNodeElementId',
+            response:'success'}        
         var recs = []
         session.run( qry , {nameParam: 'Nones'}).then( result => {
             result.records.forEach(record => {
                 console.log(record)
                 var obj = record.toObject()
                 
-                if( obj.x ){
-                    resolve( { nodes:[obj.x] , links:[] , meta:{} } );
-                }else{
+                if( obj.r ){
+                    resolve( { nodes:[] , links:[obj.r] , meta:neo_meta } );
+                }else if( obj.x ){
+                    resolve( { nodes:[obj.x] , links:[] , meta:neo_meta } );
+                }
+                else{
                     recs= obj['output'];
-                    recs['meta']={ 
-                        query:qry , 
-                        channel:'neo' , 
-                        origin:'neo' , 
-                        foreign_id:'elementId', 
-                        foreign_a:'startNodeElementId',
-                        foreign_b:'endNodeElementId',
-                        response:'success'}
-    
+                    recs['meta']=neo_meta;
+                    resolve( recs );    
                     // Map(function (element, index, array) { /* … */ }, thisArg)
                     
                     // REMAP NODE UUIDs 
-                    recs.nodes = recs.nodes.map( function( element ){
-                        element.uuid = element.elementId; 
-                        element.origin = 'neo';
-                        element.label = element.labels[0];
-                        return element
-                    });
+                    // recs.nodes = recs.nodes.map( function( element ){
+                    //     element.uuid = element.elementId; 
+                    //     element.origin = 'neo';
+                    //     element.label = element.labels[0];
+                    //     return element
+                    // });
                     
-                    // REMAP EDGE UUIDs
-                    recs.links = recs.links.map( function( element ){
-                        element.uuid = element.elementId; 
-                        element.a = element.startNodeElementId;
-                        element.b = element.endNodeElementId;
-                        element.origin = 'neo';
-                        return element
-                    });
-                    resolve( recs );                    
+                    // // REMAP EDGE UUIDs
+                    // recs.links = recs.links.map( function( element ){
+                    //     element.uuid = element.elementId; 
+                    //     element.a = element.startNodeElementId;
+                    //     element.b = element.endNodeElementId;
+                    //     element.origin = 'neo';
+                    //     return element
+                    // });
+
                 }
             })
         })
