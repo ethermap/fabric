@@ -249,27 +249,36 @@ async function process( objIn ){
             var node_obj = params.object;
 
             var label = ( node_obj.labels ) ? node_obj.labels[0] : node_obj.label;
-            // UPDATE 
-            var query_base = ' MATCH (x) WHERE ELEMENTID(x) = "'+element_id+'" '; 
-            var query_middle = ''
-            var query_middle_kv = ' {'
-            for (const [key, value] of Object.entries(node_obj.properties)) {
-                query_middle +='SET x.'+key+'="'+value+'" ';
-
-                query_middle_kv +=' '+key+':"'+value+'" ,';
-                console.log();
-            }
-            query_middle_kv += ' }'
-            qry = query_base+query_middle+"RETURN x"
             
-            var ob = node_obj.properties;
 
-            const jsonPropString = JSON.stringify(ob, null, 2).replace(/"(\w+)"\s*:/g, '$1:');    
-            // MERGE 
-            query_base = 'merge (x  :'+label+' '+jsonPropString+'  ) return x ';
-            var ff =55;
+            if( element_id ){
 
-            qry = query_base ;
+                // UPDATE EXISTING WITH SET 
+                var query_base = ' MATCH (x) WHERE ELEMENTID(x) = "'+element_id+'" '; 
+                var query_middle = ''
+                var query_middle_kv = ' {'
+                for (const [key, value] of Object.entries(node_obj.properties)) {
+                    query_middle +='SET x.'+key+'="'+value+'" ';
+                    query_middle_kv +=' '+key+':"'+value+'" ,';
+                    console.log();
+                }
+                query_middle_kv += ' }'
+                qry = query_base+query_middle+"RETURN x"                
+                
+            }else{
+                var jsonPropString = JSON.stringify( node_obj.properties, null, 2).replace(/"(\w+)"\s*:/g, '$1:');                
+                // MERGE NEW WITH MERGE 
+                query_base = 'merge (x  :'+label+' '+jsonPropString+'  ) return x ';
+                var ff =55;
+    
+                qry = query_base ;
+            }
+            
+
+            
+
+            
+
             
             
 
