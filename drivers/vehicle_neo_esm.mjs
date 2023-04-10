@@ -19,7 +19,7 @@ async function init(obj){
     testpw = obj.se;
 
     // LOCAL DEV OVERRIDE 
-    testdb = 'bolt://localhost:7687';  testun = 'neo4j';  testpw ='';
+    testdb = 'bolt://localhost:7687';  testun = 'neo4j';  testpw ='ZONE_ONE_ZERO';
     
     driver = neo4j.driver(testdb, neo4j.auth.basic( testun, testpw ) , { disableLosslessIntegers: true } );    
     session = driver.session();
@@ -266,7 +266,10 @@ async function process( objIn ){
                 qry = query_base+query_middle+"RETURN x"                
                 
             }else{
-                var jsonPropString = JSON.stringify( node_obj.properties, null, 2).replace(/"(\w+)"\s*:/g, '$1:');                
+
+                var props2 = node_obj.properties ? node_obj.properties : node_obj;
+                
+                var jsonPropString = JSON.stringify( props2, null, 2).replace(/"(\w+)"\s*:/g, '$1:');                
                 // MERGE NEW WITH MERGE 
                 query_base = 'merge (x  :'+label+' '+jsonPropString+'  ) return x ';
                 var ff =55;
