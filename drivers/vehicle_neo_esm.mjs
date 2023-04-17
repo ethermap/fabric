@@ -249,15 +249,22 @@ async function process( objIn ){
             var node_obj = params.object;
 
             var label = ( node_obj.labels ) ? node_obj.labels[0] : node_obj.label;
-            
 
+            var out_props = Object.assign({}, node_obj);
+            delete out_props.identity;
+            delete out_props.labels;
+            delete out_props.elementId;
+            
+            
             if( element_id ){
 
                 // UPDATE EXISTING WITH SET 
                 var query_base = ' MATCH (x) WHERE ELEMENTID(x) = "'+element_id+'" '; 
                 var query_middle = ''
                 var query_middle_kv = ' {'
-                for (const [key, value] of Object.entries(node_obj.properties)) {
+
+                
+                for (const [key, value] of Object.entries( out_props )) {
                     query_middle +='SET x.'+key+'="'+value+'" ';
                     query_middle_kv +=' '+key+':"'+value+'" ,';
                     console.log();
