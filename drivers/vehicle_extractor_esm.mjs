@@ -35,6 +35,17 @@ async function rawMaps(){
     })
 }
 
+async function downloadBlob( obj ){
+    console.log(' DLB ')
+    return new Promise( ( resolve , reject )=>{
+
+        var promise1 = fetchWrapped( "/data/ocn.json" )
+        Promise.all([ promise1  ]).then( (values) => {
+
+            resolve( values )
+        });
+    })
+}
 
 
 
@@ -42,4 +53,5 @@ async function rawMaps(){
 
 
 
-export { rawMaps }
+
+export { rawMaps , downloadBlob }
