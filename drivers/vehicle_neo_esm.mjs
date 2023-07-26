@@ -1,9 +1,7 @@
 
 import * as neo from './neo4j-web.js'
 
-
-
-var objIn = { ke:'x' , se:'x'}
+var objIn = { ke:'x' , se:'x' }
 var testdb;
 var testun;
 var testpw;
@@ -11,15 +9,13 @@ var driver;
 var session;
 var resset=[];
 
-
-
 async function init(obj){ 
     testdb = obj.url;
     testun = obj.ke;
     testpw = obj.se;
 
     // LOCAL DEV OVERRIDE 
-    //testdb = 'bolt://localhost:7687';  testun = 'neo4j';  testpw ='ZONE_ONE_ZERO';
+    // testdb = 'bolt://localhost:7687';  testun = 'neo4j';  testpw ='ZONE_ONE_ZERO';
     
     driver = neo4j.driver(testdb, neo4j.auth.basic( testun, testpw ) , { disableLosslessIntegers: true } );    
     session = driver.session();
@@ -238,7 +234,7 @@ async function process( objIn ){
             
         }else if( params.pattern ){
             
-            var pat_seq_1 = "MATCH g = "+payload.pattern+' ';
+            var pat_seq_1 = "MATCH g = "+params.pattern+' ';
             var convert_seq = " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output "; 
             qry = pat_seq_1 + convert_seq; 
             

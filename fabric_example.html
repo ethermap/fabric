@@ -25,9 +25,11 @@
 				
 				// SIGNING CREDENTIALS PROVIDER
 				var creds = new KeyCache();
-				await creds.loginAndLoad( 
-					[ ...String(window.location) ][37] , 
-					[ ...String(window.location) ][37] );
+				// await creds.loginAndLoad( 
+				// 	[ ...String(window.location) ][37] , 
+				// 	[ ...String(window.location) ][37] );
+
+				var k = await creds.loginAndLoad( 'neo' , 'neo');				
 
 				var ncr = creds.get('neo')
 				var k = 3;
@@ -215,10 +217,17 @@
 					}
 				}					
 
+				var reqObj_zp = {
+					module:'neo',
+					method:'process',
+					params:{
+						pattern:'(:Movie)--(:Person)'
+					}
+				}				
 				
-				var obj_M =  creds.mergeArtifacts( reqObj6 );
+				reqObj_zp =  creds.mergeArtifacts( reqObj_zp );
 				
-				fabric.mergeIntent( obj_M ); 				
+				fabric.mergeIntent( reqObj_zp ); 				
 				//await util.sleep(3000);
 
 			

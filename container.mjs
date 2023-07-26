@@ -109,9 +109,11 @@ async function init( obj ){
     if( 'driver' in obj ){
         driver = obj.driver + '_esm.mjs'
         state.module=obj.driver;
+        state.driver=obj.driver;
     }else if( 'module' in obj ){
         driver = obj.module + '_esm.mjs'
         state.module=obj.module;
+        state.driver=obj.module;
     }
     else{
         driver = 'default_esm.mjs'
