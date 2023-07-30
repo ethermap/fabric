@@ -39,7 +39,8 @@ async function downloadBlob( obj ){
     console.log(' DLB ')
     return new Promise( ( resolve , reject )=>{
 
-        var promise1 = fetchWrapped( "/data/ocn.json" )
+        var blobpath ="/data/"+obj.url+".json" ;
+        var promise1 = fetchWrapped( blobpath )
         Promise.all([ promise1  ]).then( (values) => {
 
             resolve( values )
