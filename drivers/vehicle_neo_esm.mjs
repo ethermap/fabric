@@ -105,7 +105,6 @@ async function entry( dat ){
         var convert_seg_3 = 'RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output;'
 
         var qry = id_seg_1 + tree_seg_2 + convert_seg_3;
-
         var qry; 
         if( 'pattern' in dat ){
             qry = "MATCH g = "+dat.pattern + " RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output limit 1000"; 
@@ -224,8 +223,20 @@ async function process( objIn ){
         var params = objIn.params;
         var proc;
         var qry; 
-        
-        if( params.identifier ){
+
+        if( params && params.data ){
+
+
+            if( params.data.uuid ){
+                var id_seg_1 = 'MATCH (p { uuid:"'+params.data.uuid+'" } )';
+                var tree_seg_2 = 'CALL apoc.path.spanningTree(p, { minLevel: 1, maxLevel: 1, limit:50 }) YIELD path as g '; 
+                var convert_seg_3 = 'RETURN {nodes: apoc.coll.toSet(apoc.coll.flatten(collect(nodes(g)))), links: apoc.coll.toSet(apoc.coll.flatten(collect(relationships(g))))} as output '
+                qry = id_seg_1 + tree_seg_2 + convert_seg_3;
+                
+            }
+            
+        }
+        else if( params.identifier ){
 
             var id_seg_1 = 'MATCH (p) WHERE ELEMENTID(p) = "'+params.identifier+'" ';
             var tree_seg_2 = 'CALL apoc.path.spanningTree(p, { minLevel: 1, maxLevel: 1, limit:50 }) YIELD path as g '; 
