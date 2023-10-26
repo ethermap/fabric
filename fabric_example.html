@@ -81,12 +81,26 @@
 
 
 				
-			    fabric.addEventListener( 'fabricEvent' , function( e ){
+			    fabric.addEventListener( 'fabricEvent' , async function( e ){
 			        var data=e.detail;
 					console.log('onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
 					console.log('|' )					
 			        var i=0;
 
+					if( data.module == 'extractor'){
+
+
+						// is there an array of objects to iterate and write to DB ? 
+						var extr = 'wfe';
+
+						for ( var  p in data.payload[0] ){
+
+							var feature = data.payload[0][p];
+							var l = feature;
+
+						}
+						
+					}
 
 					if( data.method =='login'){
 						
@@ -224,6 +238,15 @@
 						pattern:'(:Movie)--(:Person)'
 					}
 				}				
+
+				var reqObj_zp = {
+					module:'extractor',
+					method:'features',
+					params:{
+						pattern:'(:Movie)--(:Person)'
+					}
+				}				
+								
 				
 				reqObj_zp =  creds.mergeArtifacts( reqObj_zp );
 				
