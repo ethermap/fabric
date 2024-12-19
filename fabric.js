@@ -64,6 +64,7 @@ function messageFromWorker( e ){
         for( var p in procs ){
             console.log('              ', p , ' : ', procs[p] )
         }
+        var d = 3;
     }else{
         // PROPAGATE MESSAGES ONWARDS AS EVENTS 
         // fabricEvent struct 
@@ -72,6 +73,7 @@ function messageFromWorker( e ){
         //             uuid:
         //          payload:
         // }
+        var d5 = 5;
         dispatchEvent( new CustomEvent('fabricEvent', {detail:e.data} )  );
         //console.log('Fabric: ', e.data.method  , e.data );        
     }

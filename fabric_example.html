@@ -84,7 +84,7 @@
 			    fabric.addEventListener( 'fabricEvent' , async function( e ){
 			        var data=e.detail;
 					console.log('onFabricEvent: ',e.detail.method , '  UUID:', e.detail.uuid , '  payload:', e.detail.payload )
-					console.log('|' )					
+					console.log('|')					
 			        var i=0;
 
 					if( data.module == 'extractor'){
@@ -111,18 +111,8 @@
 						} ); 		
 					}
 					
-			    })						
-		
-				// fabric.mergeIntent( creds.mergeArtifacts( { 
-				// 	uuid:'0x0x0x',
-				// 	module:'generic',
-				// 	method:'login',
-				// 	payload:{  },  
-				// 	un:'x@x.com',
-				// 	ac:'liquid',
-				// 	pw:'2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881' //x 
-				// })); 
-
+			    })
+				
 				var reqObj1 = {
 					module:'neo',
 					method:'process',
@@ -137,7 +127,6 @@
 						identifier:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:1746' 
 					}
 				}				
-
 				var reqObj3 = {
 					module:'neo',
 					method:'process',
@@ -153,7 +142,6 @@
 						}
 					}
 				}		
-
 				var reqObj4 = {
 					module:'neo',
 					method:'process',
@@ -168,8 +156,7 @@
 							}
 						}
 					}
-				}						
-
+				}
 				var reqObj5 = {
 					module:'neo',
 					method:'process',
@@ -197,9 +184,6 @@
 						]
 					}
 				}				
-								
-
-				
 				var requestObject = { 
 					brand:'neo',
 					module:'neo',
@@ -207,14 +191,12 @@
 					pattern:'(:Actor)--(:Movie)',
 					payload:{ uuid:'4:18de4a64-650a-4f3d-9657-0526a5183d76:955' ,  a:'rtr' , b:'f4f4' }
 				}
-
 				var requestObject = { 
 					brand:'neo',
 					module:'neo',
 					method:'entry',
 					elementId:'4:f1731dc5-74ac-401d-9312-d6481729f6fb:8746'
 				}		
-
 				var reqObj6 = {
 					module:'neo',
 					method:'process',
@@ -230,15 +212,13 @@
 						}
 					}
 				}					
-
-				var reqObj_zp = {
+				var reqObj_zp1 = {
 					module:'neo',
 					method:'process',
 					params:{
 						pattern:'(:Movie)--(:Person)'
 					}
 				}				
-
 				var reqObj_zp = {
 					module:'extractor',
 					method:'features',
@@ -246,11 +226,19 @@
 						pattern:'(:Movie)--(:Person)'
 					}
 				}				
-								
+				var reqObj_chatg = {
+					module:'oai',
+					method:'query',
+					uuid:'oaioai',
+					params:{
+						query1:'givr me json list of top 10 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
+						query:'json list of top 50 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name'
+					}
+				}							
 				
-				reqObj_zp =  creds.mergeArtifacts( reqObj_zp );
+				reqObj_zp =  creds.mergeArtifacts( reqObj_chatg );
 				
-				fabric.mergeIntent( reqObj_zp ); 				
+				fabric.mergeIntent( reqObj_chatg ); 				
 				//await util.sleep(3000);
 
 			
