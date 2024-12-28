@@ -19,7 +19,7 @@
 			import KeyCache from '/keycache/keycache.js';
 			import fabric from './fabric.js';
 			import * as util from './drivers/util.js'
-
+			import { OriginMatrix } from '../frame/originmatrix.js'
 			
 			window.addEventListener( 'load' , async function(){
 				
@@ -79,7 +79,7 @@
 				// 	method:'rawMaps'
 				// } ) ); 				
 
-
+				var matrix = new OriginMatrix({});
 				
 			    fabric.addEventListener( 'fabricEvent' , async function( e ){
 			        var data=e.detail;
@@ -87,19 +87,24 @@
 					console.log('|')					
 			        var i=0;
 
-					if( data.module == 'extractor'){
+					if( data.module == 'oai'){
 
+						var payload = data.payload;
+						
+						matrix.incomingDiffFromOai( payload );
+						
+					}
+
+					if( data.module == 'extractor'){
 
 						// is there an array of objects to iterate and write to DB ? 
 						var extr = 'wfe';
-
 						for ( var  p in data.payload[0] ){
 
 							var feature = data.payload[0][p];
 							var l = feature;
 
 						}
-						
 					}
 
 					if( data.method =='login'){
@@ -111,7 +116,7 @@
 						} ); 		
 					}
 					
-			    })
+			    }); // fabricEvent
 				
 				var reqObj1 = {
 					module:'neo',
@@ -232,7 +237,8 @@
 					uuid:'oaioai',
 					params:{
 						query1:'givr me json list of top 10 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
-						query:'json list of top 50 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name'
+						query2:'json list of top 50 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
+						query:'return two arrays of json objects, one called "nodes" and the other called "links"  . In the nodes array return top 5 robotics corporations and in the links array return the relationships these companies have with eah other'
 					}
 				}							
 				
