@@ -10,7 +10,6 @@ import {io} from '/v_modules/socket.io.esm.min.js';
 
 function startsocket(){
 
-
     const socket = io.connect("/pty");
 
     socket.on("pty-output", function (data) {
@@ -29,7 +28,6 @@ function startsocket(){
         //status.innerHTML ='<span style="background-color: #ff8383;">disconnected</span>';
     });    
     //const socket = new WebSocket('wss://localhost:9999/pty');
-
 }
 
 
@@ -65,8 +63,7 @@ function query( obj_in ){
             console.error('Error fetching data:', error);
             reject(error);
         });
-        
-    } )
+    })
 }
 
 

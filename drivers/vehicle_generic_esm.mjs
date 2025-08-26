@@ -2,6 +2,27 @@
 
 
 var tkn = false; 
+var tknx = false;
+
+// In a web worker, `this` does not refer to the global scope (the worker itself) as it does in a class or object context.
+// Instead, the global scope in a web worker is `self` (or `globalThis` in modern JS).
+// If you define `var tkn = false;` at the top level, it is scoped to the module/file, not to `this`.
+// So, inside your functions, you should refer to `tkn` directly (as a variable), not as `this.tkn`.
+// 
+// Example:
+//
+// var tkn = false;
+//
+// function foo() {
+//     tkn = true; // works
+//     // this.tkn = true; // does NOT work as expected in a worker
+// }
+//
+// If you want to use a property on the global scope, use `self.tkn` or `globalThis.tkn`.
+// But for most cases, just use the variable name directly if it's defined at the top level.
+//
+// TL;DR: In a web worker, do NOT use `this.tkn` for top-level variables. Use `tkn` directly, or `self.tkn` if you want to attach to the global worker scope.
+
 
 async function init(obj){ 
 
@@ -47,7 +68,7 @@ async function postProc( data = {}) {
 
 async function call( path , dat ){
     var window = globalThis;
-    var official_base = 'http://localhost:8851'
+    var official_base = 'http://localhost:8000'
     var urlx = official_base+'/'+path;
 //    const enc = new TextEncoder();
 //    var encoded= enc.encode( dat['pw'] );    
@@ -102,7 +123,7 @@ async function register( dat ){
 async function login( dat ){
 
 
-    var res = await call( 'jxtlogin' , dat )
+    var res = await call( 'login' , dat )
     if( res && 'tkn' in res ){
         tkn=res['tkn']
     }
@@ -121,7 +142,7 @@ async function status( dat ){
     if( tkn ){
         dat['tkn']=tkn;
     }
-    var res = await call( 'jxtstatus' , dat )
+    var res = await call( 'status' , dat )
     return res;
 
 }

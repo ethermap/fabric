@@ -236,11 +236,22 @@
 					method:'query',
 					uuid:'oaioai',
 					params:{
+						query1:'give me json list of top 10 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
+						query2:'json list of top 50 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
+						query:'return two arrays of json objects, one called "nodes" and the other called "links"  . In the nodes array return top 5 robotics corporations and in the links array return the relationships these companies have with eah other'
+					}
+				}							
+				var reqObj_chatg = {
+					module:'gdb',
+					method:'query',
+					uuid:'gdbgdb',
+					params:{
 						query1:'givr me json list of top 10 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
 						query2:'json list of top 50 corporations and include attributes name, marketcap as billions of dollars decimal, headquarters , annual revenue as billions of dollars decimal, add one attribute which is a list of names of corporations who supply each, by name',
 						query:'return two arrays of json objects, one called "nodes" and the other called "links"  . In the nodes array return top 5 robotics corporations and in the links array return the relationships these companies have with eah other'
 					}
 				}							
+				
 				
 				reqObj_zp =  creds.mergeArtifacts( reqObj_chatg );
 				
