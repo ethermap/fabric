@@ -4,20 +4,21 @@
 var tkn = false; 
 var tknx = false;
 
+var generic_state={
+    un:'unknown',
+    pw:'hashed',
+    tkn:'0x0xx0x0x0'
+}
+
+// generic vehicle accepts domain / pw  input 
+//  generic derives secondary secrets / credentials 
+// generates event which is heard by session_model ?
+// session_model adds event as key_object to 
+
 // In a web worker, `this` does not refer to the global scope (the worker itself) as it does in a class or object context.
 // Instead, the global scope in a web worker is `self` (or `globalThis` in modern JS).
 // If you define `var tkn = false;` at the top level, it is scoped to the module/file, not to `this`.
 // So, inside your functions, you should refer to `tkn` directly (as a variable), not as `this.tkn`.
-// 
-// Example:
-//
-// var tkn = false;
-//
-// function foo() {
-//     tkn = true; // works
-//     // this.tkn = true; // does NOT work as expected in a worker
-// }
-//
 // If you want to use a property on the global scope, use `self.tkn` or `globalThis.tkn`.
 // But for most cases, just use the variable name directly if it's defined at the top level.
 //
@@ -152,7 +153,15 @@ async function status( dat ){
 // would this be easier than just method names based on calls: ? 
 async function sendOperation( dat ){ 
 
-    var meth = 'jxt'+dat.method; 
+    var meth = dat.method; 
+    var res = await call( meth , dat )
+    return res; 
+    
+}
+
+async function query( dat ){ 
+
+    var meth = dat.method; 
     var res = await call( meth , dat )
     return res; 
     
@@ -177,7 +186,7 @@ function pushLocal( dom , obj ){
 
 
 
-export { init , login , logout , reset , register , status , sendOperation }
+export { init , login , logout , reset , register , status , sendOperation , query }
 
 
 
