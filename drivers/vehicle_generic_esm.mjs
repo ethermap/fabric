@@ -9,6 +9,7 @@ var generic_state={
     pw:'hashed',
     tkn:'0x0xx0x0x0'
 }
+var initObj;
 
 // generic vehicle accepts domain / pw  input 
 //  generic derives secondary secrets / credentials 
@@ -30,6 +31,7 @@ async function init(obj){
     console.log(" running init on Generic  ", obj );
 
     var l = 1
+    initObj=obj;
 };
 
 //import { official_base , session_fragment } from './util.js'
@@ -167,6 +169,24 @@ async function query( dat ){
     
 }
 
+async function report( dat ){ 
+
+    var meth = dat.method; 
+
+    // Delete specified keys from dat before processing
+    const keysToDelete = ['fn', 'id', 'label', 'level']; // why was uuid being deleted here 
+    if (dat && typeof dat === 'object') {
+        for (const key of keysToDelete) {
+            if (dat.hasOwnProperty(key)) {
+                delete dat[key];
+            }
+        }
+    }
+    var res = await call( meth , dat )
+    return res; 
+    
+}
+
     //// LOCAL STORAGE 
 function getLocal(){
     var item =  localStorage.getItem('sm');
@@ -186,7 +206,7 @@ function pushLocal( dom , obj ){
 
 
 
-export { init , login , logout , reset , register , status , sendOperation , query }
+export { init , login , logout , reset , register , status , sendOperation , query , report }
 
 
 

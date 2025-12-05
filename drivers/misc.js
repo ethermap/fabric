@@ -6,11 +6,11 @@ function vf(){
 
 
 const inspectMethods = (obj = {}) => {
-   const members = Object.getOwnPropertyNames(obj);
-   const methods = members.filter(el => {
-      return typeof obj[el] === 'function';
-   })
-   return methods;
+    const members = Object.getOwnPropertyNames(obj);
+    const methods = members.filter(el => {
+        return typeof obj[el] === 'function';
+    })
+    return methods;
 };
 
 

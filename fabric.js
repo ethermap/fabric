@@ -11,13 +11,23 @@ _/  ___\____ \_ |___ ______|__| ____     _____/  ___\  _____________ ______  ___
  |__|  (______)____ _/__|  |__|\____/   \____/|__|   /______/|   ___/(______/\_____/\_____/
                                                              |__|                     */
 // LOCALS IN MOD SCOPE
+var g1 =33;
 var procs = {};                           // ALL PROCESSES
+// The following variables are created in the module (file) scope and are accessible throughout this module.
 var eventer = new EventTarget();          // FABRIC EVENTER 
 var channel = new MessageChannel();       // FOR WORKER PORTS 
 var port1 = channel.port1;                // PORT
 var port2 = channel.port2;                // PORT
 var creds = false;                        // future cache ref 
                                           // should operate with pre injected creds 
+// Generate a unique identifier for this instance of the worker module
+var proc_uuid = crypto.randomUUID ? crypto.randomUUID() : (
+    ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    )
+);
+var g0 =2; 
+
 // var is_worker = ! document;
 // var scriptnode = document.createElement('script');
 // scriptnode.setAttribute('id','pchecker');
@@ -25,6 +35,9 @@ var creds = false;                        // future cache ref
 // 	var id = '9998998';
 // 	return document.querySelector('#pchecker').previousSibling.src;
 // })();
+
+
+
 
 
 
@@ -56,7 +69,7 @@ function messageFromWorker( e ){
     // REJECT IF NO METHOD OR DATA 
     if( ! messageObject ) return
     if( !('method' in messageObject) ) return 
-    
+    console.log( "message from workers: " , messageObject )
     // USE SELF REPORT EVENTS TO ADD SUCCESSFUL WORKERS METADATA 
     if( messageObject.method == 'report'){
         procs[ messageObject.uuid ]['wid'] = messageObject['worker_id'];
@@ -95,7 +108,7 @@ async function mergeIntent( intentObj ){
 
 
     // MESSAGE EXISTING OR SPAWN 
-    var target_worker;
+    var target_worker;                                   // X ES 
     if( procs[ intentObj.uuid ] ){                       // EXISTING PROCESS OR SPAWN: 
         target_worker = procs[ intentObj.uuid ].worker;  // SHOULD INIT START DEPENDENCIES of REQUESTED NON LIVING )
         target_worker.postMessage( intentObj );

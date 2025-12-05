@@ -26,6 +26,31 @@
 				if( data.method =='login'){					
 					fabric.mergeIntent( { uuid:'0x0x0x',module:'generic',method:'status' } ); 		
 				}
+
+				if( data.method =='status'){
+					var aiObj = {
+						"id":"5",
+						"type":"Person",
+						"name":"John Smith",
+						"field":"Pharmacology",
+						"contribution":"Research on drug-plant interactions",
+						"label":"tag",
+						"uuid":"oai_JohnSmith_oid",
+						"level":2,
+						"fn":"detailEvent",
+						"ctx":{"nodes":[],"links":[]}
+					}
+					
+		            var fabObj = {};
+		            fabObj.module='generic';
+		            fabObj.method ='report';
+					fabObj.uuid='0x0x0x'
+		            fabObj.params = aiObj;
+		            fabric.mergeIntent( fabObj );
+					
+				}
+
+		
 				
 			}); // fabricEvent
 							
@@ -44,7 +69,10 @@
 					method:'login',
 					payload:{ un:'x@x.com', pw:'x' }
 				}
-				fabric.mergeIntent( reqObj1 ); 				
+				fabric.mergeIntent( reqObj1 ); 		
+
+
+				
 			});
 		</script>
 
